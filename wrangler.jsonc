@@ -1,5 +1,14 @@
 {
   "name": "aetdraweb",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./dist", "not_found_handling": "404-page" }
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"]
+  },
+  "triggers": { "crons": ["*/5 * * * *"] },
+  "durable_objects": { "bindings": [{ "name": "HISTORIAL", "class_name": "Historial" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Historial"] }]
 }

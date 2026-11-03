@@ -7,7 +7,7 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        "img-src 'self' data:",
+        "img-src 'self' data: https://mc-heads.net",
         "font-src 'self'",
         "connect-src 'self' https://api.mcsrvstat.us",
         "object-src 'none'",

@@ -1,35 +1,211 @@
-﻿---
+---
 import Base from '../layouts/Base.astro';
+import Pixel from '../components/Pixel.astro';
 import { site } from '../site';
 ---
-<Base titulo="Estado" descripcion="Comprueba si AetdraMC está en línea y cuántos jugadores hay.">
+<Base titulo="Estado" descripcion="Estado de AetdraMC, jugadores conectados e historial de los últimos 30 días.">
+  <p class="etiqueta">En directo</p>
   <h1>Estado</h1>
-  <div class="card estado" id="estado" data-ip={site.ip} aria-live="polite">
-    <h2 id="estado-titulo">Comprobando…</h2>
-    <p id="estado-detalle">{site.ip}</p>
-  </div>
+
+  <section class="ahora card" aria-live="polite">
+    <span class="luz" id="luz"></span>
+    <div>
+      <h2 id="estado-titulo">Comprobando…</h2>
+      <p id="estado-detalle">{site.ip}</p>
+    </div>
+  </section>
+
+  <section class="card grafica">
+    <div class="cabecera">
+      <div>
+        <h2><Pixel nombre="reloj" tam={26} />Jugadores conectados</h2>
+        <p id="resumen">Cargando historial…</p>
+      </div>
+      <div class="rangos" role="group" aria-label="Periodo">
+        <button data-rango="30">30 días</button>
+        <button data-rango="14">14 días</button>
+        <button data-rango="7" class="activo">7 días</button>
+      </div>
+    </div>
+    <div id="lienzo" class="lienzo"></div>
+    <details>
+      <summary>Ver los datos en tabla</summary>
+      <div class="tabla"><table><thead><tr><th>Fecha</th><th>Media</th><th>Pico</th></tr></thead><tbody id="filas"></tbody></table></div>
+    </details>
+  </section>
+
+  <section class="conectados">
+    <div class="cabecera">
+      <h2 class="titulo"><Pixel nombre="corazon" tam={34} />Jugando ahora</h2>
+      <p id="conectados-texto"></p>
+    </div>
+    <div id="lista" class="lista"></div>
+  </section>
 </Base>
 
 <style>
-  .estado { max-width: 480px; }
+  .ahora { display: flex; align-items: center; gap: 18px; max-width: 520px; margin-bottom: 20px; }
+  .ahora h2 { margin: 0; text-transform: uppercase; }
+  .ahora p { margin: 0; }
+  .luz { flex: none; width: 18px; height: 18px; background: var(--muted); }
+  .luz.on { background: #5be37d; box-shadow: 0 0 12px #5be37d; }
+  .luz.off { background: var(--red); }
+  .grafica { padding: 26px; margin-bottom: 56px; }
+  .cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 14px 24px; margin-bottom: 18px; }
+  .grafica h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; text-transform: uppercase; }
+  .grafica .cabecera p { margin: 0; color: var(--muted); }
+  #resumen :global(b) { color: var(--gold); }
+  .rangos { display: flex; gap: 6px; }
+  .rangos button { border: 0; padding: 8px 14px; background: #8b8b8b; color: #1d1d1d; font: 800 .9rem 'Nunito Variable', sans-serif; cursor: pointer; box-shadow: inset 3px 3px 0 #c6c6c6, inset -3px -3px 0 #555; }
+  .rangos button.activo { background: var(--gold); box-shadow: inset 3px 3px 0 #ffe9a6, inset -3px -3px 0 #a86d00; }
+  .lienzo { min-height: 240px; }
+  .lienzo :global(svg) { display: block; width: 100%; height: auto; }
+  .lienzo :global(.vacio) { display: grid; place-items: center; min-height: 240px; color: var(--muted); text-align: center; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; font-weight: 800; }
+  .tabla { max-height: 280px; overflow: auto; margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+  .conectados .titulo { display: flex; align-items: center; gap: 12px; font-size: clamp(2rem, 5vw, 3.2rem); text-transform: uppercase; margin: 0; }
+  .conectados .cabecera p { margin: 0; color: var(--muted); }
+  .lista { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .lista :global(.jugador) { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--panel); clip-path: var(--pix); font-weight: 800; }
+  .lista :global(img) { width: 40px; height: 40px; image-rendering: pixelated; box-shadow: inset 0 0 0 2px #000; }
+  .lista :global(.nota) { color: var(--muted); grid-column: 1 / -1; }
 </style>
 
 <script>
-  const caja = document.getElementById('estado');
-  const titulo = document.getElementById('estado-titulo');
-  const detalle = document.getElementById('estado-detalle');
-  try {
-    const r = await fetch(`https://api.mcsrvstat.us/3/${caja?.dataset.ip}`);
-    if (!r.ok) throw new Error(String(r.status));
-    const d = await r.json();
-    if (titulo && detalle) {
-      titulo.textContent = d.online ? 'En línea' : 'Fuera de línea';
-      detalle.textContent = d.online ? `${d.players?.online ?? 0} jugando ahora` : 'Vuelve a intentarlo en unos minutos o pregunta en Discord.';
+  type Punto = { t: number; media: number; pico: number };
+  type Datos = {
+    rango: number;
+    paso: number;
+    puntos: Punto[];
+    resumen: { media: number | null; pico: number | null; muestras: number };
+    ahora: { ts: number; online: boolean; jugadores: number; lista: string[] };
+  };
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const fechaCorta = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short' });
+  const fechaHora = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag: string, attrs: Record<string, string | number>, texto?: string) => {
+    const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
+    if (texto) n.textContent = texto;
+    return n;
+  };
+
+  function dibujar(d: Datos) {
+    const lienzo = $('lienzo');
+    lienzo.replaceChildren();
+    if (d.puntos.length < 2) {
+      const v = document.createElement('p');
+      v.className = 'vacio';
+      v.textContent = 'Recopilando datos: la gráfica se irá llenando cada 5 minutos.';
+      lienzo.append(v);
+      return;
     }
-  } catch {
-    if (titulo && detalle) {
-      titulo.textContent = 'Estado no disponible';
-      detalle.textContent = 'No se pudo comprobar el servidor ahora mismo.';
+    const W = 1000, H = 260, iz = 36, ab = 26, ar = 10;
+    const fin = Math.floor(Date.now() / 1000);
+    const ini = fin - d.rango * 86400;
+    const max = Math.max(5, ...d.puntos.map((p) => p.pico));
+    const tope = Math.ceil(max / 5) * 5;
+    const x = (t: number) => iz + ((t - ini) / (fin - ini)) * (W - iz);
+    const y = (v: number) => ar + (1 - v / tope) * (H - ar - ab);
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Jugadores conectados en los últimos ${d.rango} días` });
+    for (let i = 0; i <= 4; i++) {
+      const v = (tope / 4) * i;
+      svg.append(el('line', { x1: iz, x2: W, y1: y(v), y2: y(v), stroke: '#3d1c11', 'stroke-width': 1 }));
+      svg.append(el('text', { x: iz - 8, y: y(v) + 4, 'text-anchor': 'end', fill: '#cdb4a2', 'font-size': 12 }, String(Math.round(v))));
+    }
+    for (let i = 0; i <= 4; i++) {
+      const t = ini + ((fin - ini) / 4) * i;
+      svg.append(el('text', { x: x(t), y: H - 6, 'text-anchor': i === 0 ? 'start' : i === 4 ? 'end' : 'middle', fill: '#cdb4a2', 'font-size': 12 }, fechaCorta.format(t * 1000)));
+    }
+    const linea = d.puntos.map((p, i) => `${i ? 'L' : 'M'}${x(p.t).toFixed(1)},${y(p.media).toFixed(1)}`).join('');
+    const ultimo = d.puntos[d.puntos.length - 1];
+    svg.append(el('path', { d: `${linea}L${x(ultimo.t)},${y(0)}L${x(d.puntos[0].t)},${y(0)}Z`, fill: 'rgb(255 106 19 / .18)' }));
+    svg.append(el('path', { d: linea, fill: 'none', stroke: '#ff6a13', 'stroke-width': 2.5, 'stroke-linejoin': 'round' }));
+    const ancho = Math.max(2, (W - iz) / (d.rango * 86400 / d.paso));
+    for (const p of d.puntos) {
+      const r = el('rect', { x: x(p.t) - ancho / 2, y: ar, width: ancho, height: H - ar - ab, fill: 'transparent' });
+      r.append(el('title', {}, `${fechaHora.format(p.t * 1000)}: media ${p.media}, pico ${p.pico}`));
+      svg.append(r);
+    }
+    lienzo.append(svg);
+  }
+
+  function tabla(d: Datos) {
+    const filas = $('filas');
+    filas.replaceChildren(...[...d.puntos].reverse().map((p) => {
+      const tr = document.createElement('tr');
+      for (const v of [fechaHora.format(p.t * 1000), String(p.media), String(p.pico)]) {
+        const td = document.createElement('td');
+        td.textContent = v;
+        tr.append(td);
+      }
+      return tr;
+    }));
+  }
+
+  function ahora(d: Datos) {
+    const a = d.ahora;
+    $('luz').className = `luz ${a.ts ? (a.online ? 'on' : 'off') : ''}`;
+    $('estado-titulo').textContent = !a.ts ? 'Sin datos todavía' : a.online ? 'En línea' : 'Fuera de línea';
+    $('estado-detalle').textContent = a.ts ? `${a.jugadores} ${a.jugadores === 1 ? 'jugador conectado' : 'jugadores conectados'} · actualizado ${fechaHora.format(a.ts * 1000)}` : 'La primera lectura llega en menos de 5 minutos.';
+    $('conectados-texto').textContent = a.online ? `${a.jugadores} ${a.jugadores === 1 ? 'jugador dentro' : 'jugadores dentro'} en este momento.` : '';
+    const lista = $('lista');
+    lista.replaceChildren();
+    if (a.lista.length) {
+      for (const nick of a.lista) {
+        const fila = document.createElement('div');
+        fila.className = 'jugador';
+        const img = document.createElement('img');
+        img.src = `https://mc-heads.net/avatar/${encodeURIComponent(nick)}/40`;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.width = 40;
+        img.height = 40;
+        const nombre = document.createElement('span');
+        nombre.textContent = nick;
+        fila.append(img, nombre);
+        lista.append(fila);
+      }
+    } else {
+      const nota = document.createElement('p');
+      nota.className = 'nota';
+      nota.textContent = a.jugadores ? 'El servidor no comparte la lista de nicks ahora mismo.' : 'No hay nadie conectado ahora mismo. ¡Sé el primero!';
+      lista.append(nota);
     }
   }
+
+  async function cargar(rango: string) {
+    try {
+      const r = await fetch(`/api/estado?rango=${rango}`);
+      if (!r.ok) throw new Error(String(r.status));
+      const d: Datos = await r.json();
+      const { media, pico } = d.resumen;
+      const resumen = $('resumen');
+      const negrita = (v: unknown) => Object.assign(document.createElement('b'), { textContent: String(v) });
+      if (media === null) resumen.textContent = 'Aún no hay lecturas guardadas.';
+      else resumen.replaceChildren('Media ', negrita(media), ' · pico ', negrita(pico), ` en los últimos ${d.rango} días`);
+      dibujar(d);
+      tabla(d);
+      ahora(d);
+    } catch {
+      $('resumen').textContent = 'No se pudo cargar el historial.';
+      $('estado-titulo').textContent = 'Estado no disponible';
+    }
+  }
+
+  let rangoActual = '7';
+  const botones = document.querySelectorAll<HTMLButtonElement>('.rangos button');
+  botones.forEach((b) => b.addEventListener('click', () => {
+    botones.forEach((o) => o.classList.toggle('activo', o === b));
+    rangoActual = b.dataset.rango!;
+    cargar(rangoActual);
+  }));
+  cargar(rangoActual);
+  // El Worker lee el servidor cada 5 minutos; la página vuelve a pedirlo cada minuto.
+  setInterval(() => { if (!document.hidden) cargar(rangoActual); }, 60000);
 </script>
