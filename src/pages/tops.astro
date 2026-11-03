@@ -1,7 +1,186 @@
 ---
 import Base from '../layouts/Base.astro';
+import Pixel from '../components/Pixel.astro';
+
+// Icono de cada categoría que envía el plugin; las desconocidas usan el cofre.
+const iconos: Record<string, string> = {
+  pvp: 'espada', koth: 'corona', trabajos: 'pico', dinero: 'esmeralda', tiempo: 'reloj', clanes: 'bandera', otro: 'cofre',
+};
 ---
-<Base titulo="Tops">
+<Base titulo="Tops" descripcion="Los mejores jugadores de AetdraMC en PvP, KOTH, trabajos, dinero, tiempo de juego y clanes.">
+  <p class="etiqueta">Clasificación</p>
   <h1>Tops</h1>
-  <p class="aviso">Las clasificaciones del servidor llegarán pronto.</p>
+  <p class="intro" id="actualizado">Cargando clasificaciones…</p>
+
+  <div class="categorias" id="categorias" role="tablist" aria-label="Categoría"></div>
+
+  <section class="podio" id="podio" aria-live="polite"></section>
+  <ol class="tabla" id="tabla" start="4"></ol>
+
+  <template id="iconos">
+    {Object.entries(iconos).map(([id, nombre]) => <span data-icono={id}><Pixel nombre={nombre} tam={26} /></span>)}
+  </template>
 </Base>
+
+<style>
+  .categorias { display: flex; flex-wrap: wrap; gap: 0; padding: 4px; margin-bottom: 40px; background: rgb(20 8 4 / .8); width: fit-content; max-width: 100%; }
+  .categorias :global(button) { display: grid; place-items: center; gap: 2px; width: 82px; height: 74px; margin: 2px; border: 0; cursor: pointer; background: rgb(139 139 139 / .55); color: var(--text); font: .72rem var(--display); letter-spacing: .04em; text-transform: uppercase; box-shadow: inset 2px 2px 0 rgb(55 55 55 / .8), inset -2px -2px 0 rgb(255 255 255 / .5); }
+  .categorias :global(button[aria-selected='true']) { outline: 4px solid #fff; outline-offset: -1px; background: rgb(255 182 39 / .35); }
+  .categorias :global(svg) { height: 26px; width: auto; }
+  .podio { display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: 12px; max-width: 760px; margin: 0 auto 36px; }
+  .podio :global(.puesto) { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .podio :global(canvas) { width: 100%; max-width: 220px; height: auto; aspect-ratio: 3 / 4; }
+  .podio :global(.nick) { font: 1.2rem var(--display); margin: 4px 0 2px; overflow-wrap: anywhere; }
+  .podio :global(.valor) { color: var(--muted); font-weight: 800; font-size: .9rem; margin: 0 0 10px; }
+  .podio :global(.pilar) { width: 100%; display: grid; place-items: start center; padding-top: 10px; font: 2.4rem var(--display); color: rgb(0 0 0 / .55); box-shadow: inset 6px 0 0 rgb(255 255 255 / .18), inset -6px 0 0 rgb(0 0 0 / .25), inset 0 6px 0 rgb(255 255 255 / .25); }
+  .podio :global(.p1 .pilar) { height: 150px; background: var(--pixels), #f5c33b; }
+  .podio :global(.p2 .pilar) { height: 110px; background: var(--pixels), #cfd6dc; }
+  .podio :global(.p3 .pilar) { height: 80px; background: var(--pixels), #c9733a; }
+  .podio :global(.p1) { order: 2; }
+  .podio :global(.p2) { order: 1; }
+  .podio :global(.p3) { order: 3; }
+  .tabla { list-style: none; max-width: 760px; margin: 0 auto; padding: 0; display: grid; gap: 6px; }
+  .tabla :global(li) { display: grid; grid-template-columns: 44px 48px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 8px 16px; background: var(--panel); clip-path: var(--pix); }
+  .tabla :global(.pos) { font: 1.3rem var(--display); color: var(--gold); text-align: center; }
+  .tabla :global(.cabeza) { display: grid; place-items: center; width: 48px; height: 48px; background: #8b8b8b; box-shadow: inset 3px 3px 0 #373737, inset -3px -3px 0 #fff; }
+  .tabla :global(.cabeza img) { width: 36px; height: 36px; image-rendering: pixelated; }
+  .tabla :global(.cabeza svg) { height: 26px; width: auto; }
+  .tabla :global(.nombre) { font-weight: 800; overflow-wrap: anywhere; }
+  .tabla :global(.cifra) { font: 1.05rem var(--display); }
+  .tabla :global(.vacio) { display: block; text-align: center; color: var(--muted); }
+  @media (max-width: 560px) {
+    .podio { gap: 6px; }
+    .podio :global(.nick) { font-size: .95rem; }
+    .podio :global(.pilar) { font-size: 1.6rem; }
+    .tabla :global(li) { grid-template-columns: 32px 44px minmax(0, 1fr); }
+    .tabla :global(.cifra) { grid-column: 3; }
+  }
+</style>
+
+<script>
+  import { SkinViewer, WaveAnimation, IdleAnimation } from 'skinview3d';
+
+  type Jugador = { pos: number; nick: string; valor: number; skin: string | null };
+  type Categoria = { id: string; nombre: string; unidad: string; jugadores: Jugador[] };
+  type Tops = { generado: number; recibido: number; categorias: Categoria[] };
+
+  const NMSR = 'https://nmsr.nickac.dev';
+  // Textura de Steve, para quien no tenga skin o falle al cargar.
+  const STEVE = '31f477eb1a7beee631c2ca64d06f8f68fa93a3386d04452ab27f43acdf1b60cb';
+  const quieto = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const numero = new Intl.NumberFormat('es');
+  let visores: SkinViewer[] = [];
+
+  const icono = (id: string) => {
+    const t = document.getElementById('iconos') as HTMLTemplateElement;
+    const span = t.content.querySelector(`[data-icono="${id}"]`) ?? t.content.querySelector('[data-icono="otro"]');
+    return span!.firstElementChild!.cloneNode(true);
+  };
+  const crear = (tag: string, clase?: string, texto?: string) => {
+    const n = document.createElement(tag);
+    if (clase) n.className = clase;
+    if (texto !== undefined) n.textContent = texto;
+    return n;
+  };
+  const cifra = (c: Categoria, v: number) => {
+    if (c.id === 'dinero') return `$${numero.format(v)}`;
+    return `${numero.format(v)}${c.unidad ? ` ${c.unidad}` : ''}`;
+  };
+  // Las categorías de clanes no son jugadores: sin skin no se busca por nombre.
+  const ref = (c: Categoria, j: Jugador) => j.skin ?? (c.id === 'clanes' ? null : encodeURIComponent(j.nick));
+
+  function podio(c: Categoria) {
+    visores.forEach((v) => v.dispose());
+    visores = [];
+    const caja = document.getElementById('podio')!;
+    caja.replaceChildren();
+    c.jugadores.filter((j) => j.pos <= 3).forEach((j) => {
+      const puesto = crear('div', `puesto p${j.pos}`);
+      const lienzo = document.createElement('canvas');
+      lienzo.setAttribute('aria-label', `Skin de ${j.nick}`);
+      puesto.append(lienzo, crear('p', 'nick', j.nick), crear('p', 'valor', cifra(c, j.valor)), crear('div', 'pilar', String(j.pos)));
+      caja.append(puesto);
+      const r = ref(c, j);
+      const visor = new SkinViewer({ canvas: lienzo, width: 220, height: 293 });
+      visor.zoom = 0.82;
+      visor.fov = 40;
+      visor.controls.enableZoom = false;
+      visor.controls.enablePan = false;
+      visor.loadSkin(`${NMSR}/skin/${r ?? STEVE}`).catch(() => visor.loadSkin(`${NMSR}/skin/${STEVE}`).catch(() => {}));
+      const brazos = visor.playerObject.skin;
+      if (j.pos === 1) {
+        brazos.leftArm.rotation.z = 2.7;
+        brazos.rightArm.rotation.z = -2.7;
+      } else if (j.pos === 2) {
+        visor.animation = new WaveAnimation();
+      } else {
+        visor.animation = new IdleAnimation();
+      }
+      visor.playerObject.rotation.y = j.pos === 2 ? 0.45 : j.pos === 3 ? -0.45 : 0;
+      if (quieto && visor.animation) visor.animation.paused = true;
+      visores.push(visor);
+    });
+  }
+
+  function tabla(c: Categoria) {
+    const lista = document.getElementById('tabla')!;
+    lista.replaceChildren();
+    for (const j of c.jugadores.filter((x) => x.pos > 3 && x.pos <= 15)) {
+      const li = crear('li');
+      const cabeza = crear('span', 'cabeza');
+      const r = ref(c, j);
+      if (r) {
+        const img = document.createElement('img');
+        img.src = `${NMSR}/headiso/${r}`;
+        img.addEventListener('error', () => { img.src = `${NMSR}/headiso/${STEVE}`; }, { once: true });
+        img.alt = '';
+        img.loading = 'lazy';
+        img.width = 36;
+        img.height = 36;
+        cabeza.append(img);
+      } else {
+        cabeza.append(icono(c.id));
+      }
+      li.append(crear('span', 'pos', String(j.pos)), cabeza, crear('span', 'nombre', j.nick), crear('span', 'cifra', cifra(c, j.valor)));
+      lista.append(li);
+    }
+    if (!c.jugadores.length) lista.append(crear('li', 'vacio', 'Todavía no hay nadie en esta clasificación.'));
+  }
+
+  function mostrar(datos: Tops, id: string) {
+    const c = datos.categorias.find((x) => x.id === id) ?? datos.categorias[0];
+    document.querySelectorAll<HTMLButtonElement>('#categorias button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.id === c.id)));
+    podio(c);
+    tabla(c);
+  }
+
+  async function iniciar() {
+    const texto = document.getElementById('actualizado')!;
+    try {
+      const r = await fetch('/api/tops');
+      if (!r.ok) throw new Error(String(r.status));
+      const datos: Tops = await r.json();
+      if (!datos.categorias.length) {
+        texto.textContent = 'Las clasificaciones aparecerán aquí en cuanto el servidor envíe los primeros datos.';
+        return;
+      }
+      const minutos = Math.max(0, Math.round((Date.now() / 1000 - datos.recibido) / 60));
+      texto.textContent = `Actualizado hace ${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}. Se renueva cada 10 minutos.`;
+      const barra = document.getElementById('categorias')!;
+      for (const c of datos.categorias) {
+        const b = crear('button') as HTMLButtonElement;
+        b.type = 'button';
+        b.dataset.id = c.id;
+        b.setAttribute('role', 'tab');
+        b.append(icono(c.id), crear('span', undefined, c.nombre));
+        b.addEventListener('click', () => mostrar(datos, c.id));
+        barra.append(b);
+      }
+      mostrar(datos, datos.categorias[0].id);
+    } catch {
+      texto.textContent = 'No se pudieron cargar las clasificaciones ahora mismo.';
+    }
+  }
+
+  iniciar();
+</script>

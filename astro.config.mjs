@@ -7,9 +7,9 @@ export default defineConfig({
     csp: {
       directives: [
         "default-src 'self'",
-        "img-src 'self' data: https://mc-heads.net",
+        "img-src 'self' data: blob: https://nmsr.nickac.dev",
         "font-src 'self'",
-        "connect-src 'self' https://api.mcsrvstat.us",
+        "connect-src 'self' https://api.mcsrvstat.us https://nmsr.nickac.dev",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
