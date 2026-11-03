@@ -112,7 +112,8 @@ const preguntas = [
         <h2 class="titulo"><Pixel nombre="corona" tam={38} />Tops</h2>
         <Image class="render-mini" src={renderTops} alt="Render de la skin de Meliinoeee" width={300} />
       </div>
-      <ol class="podio" aria-label="Clasificación todavía sin datos">
+      <p class="podio-cat" id="podio-cat" aria-live="polite"></p>
+      <ol class="podio" id="podio-inicio" aria-label="Top 3 del servidor">
         <li><span class="num">1</span>Próximamente</li>
         <li><span class="num">2</span>Próximamente</li>
         <li><span class="num">3</span>Próximamente</li>
@@ -192,8 +193,12 @@ const preguntas = [
   .doble { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
   .lista { display: grid; gap: 14px; margin-bottom: 22px; }
   .podio { list-style: none; margin: 0 0 22px; padding: 10px 24px; background: var(--panel); clip-path: var(--pix); }
-  .podio li { display: flex; align-items: center; gap: 16px; padding: 12px 0; color: var(--muted); font: 1.1rem var(--display); }
-  .podio li + li .num { background: var(--gold); }
+  .podio :global(li) { display: flex; align-items: center; gap: 16px; padding: 12px 0; color: var(--muted); font: 1.1rem var(--display); }
+  .podio :global(li + li .num) { background: var(--gold); }
+  .podio :global(img) { width: 36px; height: 36px; image-rendering: pixelated; }
+  .podio :global(.nick) { color: var(--text); overflow-wrap: anywhere; }
+  .podio :global(.valor) { margin-left: auto; color: var(--gold); font-size: .95rem; white-space: nowrap; }
+  .podio-cat { min-height: 1.4em; margin: -12px 0 10px; color: var(--muted); font-weight: 800; }
   .preguntas { display: grid; gap: 10px; max-width: 800px; }
   details { background: var(--panel); clip-path: var(--pix); padding: 4px 22px; }
   summary { cursor: pointer; padding: 12px 0; font: 1.1rem var(--display); }
@@ -248,6 +253,40 @@ const preguntas = [
     .then((d) => {
       if (!d.online || !jugadores) return;
       jugadores.textContent = String(d.players?.online ?? 0);
+    })
+    .catch(() => {});
+
+  // Top 3 de la portada: rota entre las categorías que envía el servidor.
+  const NMSR = 'https://nmsr.nickac.dev';
+  const STEVE = '31f477eb1a7beee631c2ca64d06f8f68fa93a3386d04452ab27f43acdf1b60cb';
+  const numero = new Intl.NumberFormat('es');
+  fetch('/api/tops')
+    .then((r) => r.json())
+    .then((d: { categorias: { id: string; nombre: string; unidad: string; jugadores: { pos: number; nick: string; valor: number; skin: string | null }[] }[] }) => {
+      const cats = d.categorias.filter((c) => c.jugadores.length);
+      const lista = document.getElementById('podio-inicio');
+      const titulo = document.getElementById('podio-cat');
+      if (!cats.length || !lista || !titulo) return;
+      let i = 0;
+      const pintar = () => {
+        const c = cats[i % cats.length];
+        titulo.textContent = `Top ${c.nombre}`;
+        lista.replaceChildren(...c.jugadores.filter((j) => j.pos <= 3).map((j) => {
+          const li = document.createElement('li');
+          const num = Object.assign(document.createElement('span'), { className: 'num', textContent: String(j.pos) });
+          const img = Object.assign(document.createElement('img'), { alt: '', width: 36, height: 36 });
+          img.src = `${NMSR}/headiso/${j.skin ?? (c.id === 'clanes' ? STEVE : encodeURIComponent(j.nick))}`;
+          img.addEventListener('error', () => { img.src = `${NMSR}/headiso/${STEVE}`; }, { once: true });
+          const nick = Object.assign(document.createElement('span'), { className: 'nick', textContent: j.nick });
+          const cifra = c.id === 'dinero' ? `${numero.format(j.valor)}` : `${numero.format(j.valor)}${c.unidad ? ` ${c.unidad}` : ''}`;
+          const valor = Object.assign(document.createElement('span'), { className: 'valor', textContent: cifra });
+          li.append(num, img, nick, valor);
+          return li;
+        }));
+        i++;
+      };
+      pintar();
+      if (cats.length > 1) setInterval(pintar, 6000);
     })
     .catch(() => {});
 
