@@ -1,0 +1,18 @@
+---
+import Texto from '../layouts/Texto.astro';
+import { site } from '../site';
+---
+<Texto titulo="Contacto" icono="libro" descripcion="Cómo contactar con el equipo de AetdraMC.">
+  <p class="intro">La forma más rápida de hablar con el equipo es nuestro Discord.</p>
+  <p><a class="btn" href={site.discord}>Entrar a Discord</a></p>
+
+  <h2>Dentro del juego</h2>
+  <p>Usa <code>/helpop mensaje</code> para avisar al equipo que esté conectado.</p>
+
+  <h2>Antes de escribir</h2>
+  <ul>
+    <li>Indica tu nick de Minecraft.</li>
+    <li>Explica qué pasó y, si puedes, adjunta capturas.</li>
+    <li>Nunca envíes tu contraseña.</li>
+  </ul>
+</Texto>

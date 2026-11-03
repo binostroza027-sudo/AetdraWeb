@@ -1,0 +1,27 @@
+---
+import Texto from '../layouts/Texto.astro';
+import { site } from '../site';
+---
+<Texto titulo="No premium" icono="bloque" descripcion="Cómo jugar en AetdraMC sin cuenta premium de Minecraft.">
+  <p class="intro">En AetdraMC puedes jugar aunque no tengas una cuenta premium de Minecraft.</p>
+
+  <h2>Primera vez</h2>
+  <ol>
+    <li>Entra a <code>{site.ip}</code> desde Minecraft Java.</li>
+    <li>Crea tu cuenta con <code>/register contraseña contraseña</code>.</li>
+    <li>Usa una contraseña que no uses en ningún otro sitio.</li>
+  </ol>
+
+  <h2>Las siguientes veces</h2>
+  <p>Inicia sesión con <code>/login contraseña</code> cada vez que entres.</p>
+
+  <h2>Si tienes cuenta premium</h2>
+  <p>Puedes marcar tu cuenta como premium con <code>/premium</code> para entrar sin contraseña.</p>
+
+  <h2>Cuida tu cuenta</h2>
+  <ul>
+    <li>El equipo nunca te pedirá tu contraseña.</li>
+    <li>No compartas tu contraseña con nadie.</li>
+    <li>Si tienes problemas para entrar, pide ayuda en nuestro <a href={site.discord}>Discord</a>.</li>
+  </ul>
+</Texto>

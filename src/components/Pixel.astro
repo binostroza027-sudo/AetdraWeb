@@ -1,0 +1,141 @@
+---
+// Iconos pixelados propios, dibujados celda a celda. '.' es transparente.
+const colores: Record<string, string> = {
+  a: '#2b1608', b: '#5a3415', c: '#a8732f', d: '#8a5a2b', e: '#6b4220',
+  g: '#5fbf3a', l: '#8ee05a', v: '#2ed573', V: '#178a46', m: '#a6ffb6',
+  s: '#c9d6df', w: '#ffffff', x: '#e0e0e0', h: '#ffb627', y: '#ffd34d', o: '#ff6a13',
+  r: '#e8231a', R: '#9c1208', p: '#ffb3b3', n: '#7fe3f2', N: '#2bb0c9',
+};
+
+const iconos: Record<string, string[]> = {
+  pico: [
+    '.nnnnnn...',
+    'nNNNNNNn..',
+    '.n...dNNn.',
+    '.....d.nn.',
+    '....d...n.',
+    '...d......',
+    '..d.......',
+    '.d........',
+    'd.........',
+  ],
+  espada: [
+    '........ss',
+    '.......sws',
+    '......sws.',
+    '.....sws..',
+    '.h..sws...',
+    '..hsws....',
+    '...hs.....',
+    '..ehh.....',
+    '.ee..h....',
+    'ee........',
+  ],
+  corona: [
+    'y...y...y',
+    'yy.yyy.yy',
+    'yhyhyhyhy',
+    'yyyyyyyyy',
+    'hrhhvhhrh',
+    'hhhhhhhhh',
+  ],
+  cofre: [
+    '.bbbbbbbb.',
+    'bccccccccb',
+    'bccccccccb',
+    'bbbbxxbbbb',
+    'bccccxcccb',
+    'bccccccccb',
+    'bccccccccb',
+    '.bbbbbbbb.',
+  ],
+  esmeralda: [
+    '...vv...',
+    '..vmmv..',
+    '.vmmvvv.',
+    'vmmvvvVv',
+    'vvvvvVVv',
+    '.vvvVVv.',
+    '..vVVv..',
+    '...vv...',
+  ],
+  hoja: [
+    '.....gg.',
+    '....ggg.',
+    '...gglg.',
+    '..gglgg.',
+    '.gglgg..',
+    '.glgg...',
+    'glg.....',
+    'l.......',
+  ],
+  corazon: [
+    '.rr.rr.',
+    'rprrrrr',
+    'rrrrrrr',
+    '.rrrrR.',
+    '..rRR..',
+    '...R...',
+  ],
+  bandera: [
+    'drrrrrr.',
+    'drrhrrr.',
+    'drhhhrr.',
+    'drrhrrr.',
+    'drrrrrr.',
+    'd.......',
+    'd.......',
+    'd.......',
+  ],
+  bloque: [
+    'gggggggg',
+    'glggggLg',
+    'gdgdggdg',
+    'dddddddd',
+    'ddedddde',
+    'dddddddd',
+    'deddddde',
+    'dddddedd',
+  ],
+  antorcha: [
+    '.y.',
+    'yoy',
+    '.o.',
+    '.d.',
+    '.d.',
+    '.d.',
+    '.d.',
+  ],
+  libro: [
+    '.bbbbbb.',
+    'bccccccb',
+    'bcxxxxcb',
+    'bccccccb',
+    'bcxxxxcb',
+    'bccccccb',
+    'brrrrrrb',
+    '.bbbbbb.',
+  ],
+  reloj: [
+    '..hhhh..',
+    '.hnnnnh.',
+    'hnnnyynh',
+    'hnngyynh',
+    'hggggggh',
+    'hgglgggh',
+    '.hggggh.',
+    '..hhhh..',
+  ],
+};
+colores.L = '#8ee05a';
+
+const { nombre, tam = 28, class: clase } = Astro.props;
+const filas = iconos[nombre] ?? [];
+const ancho = Math.max(...filas.map((f) => f.length));
+const celdas = filas.flatMap((fila, y) =>
+  [...fila].map((ch, x) => ({ x, y, color: colores[ch] })).filter((c) => c.color),
+);
+---
+<svg class:list={['pixel', clase]} width={tam} height={(tam * filas.length) / ancho} viewBox={`0 0 ${ancho} ${filas.length}`} shape-rendering="crispEdges" aria-hidden="true">
+  {celdas.map((c) => <rect x={c.x} y={c.y} width="1.02" height="1.02" fill={c.color} />)}
+</svg>

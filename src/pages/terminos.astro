@@ -1,0 +1,57 @@
+---
+import Legal from '../layouts/Legal.astro';
+import A from '../components/Apartado.astro';
+import { site } from '../site';
+
+const secciones = [
+  { id: 'servicio', titulo: 'Qué es AetdraMC' },
+  { id: 'cuenta', titulo: 'Tu cuenta' },
+  { id: 'conducta', titulo: 'Conducta y sanciones' },
+  { id: 'progreso', titulo: 'Objetos y progreso' },
+  { id: 'compras', titulo: 'Compras' },
+  { id: 'propiedad', titulo: 'Propiedad intelectual' },
+  { id: 'disponibilidad', titulo: 'Disponibilidad y responsabilidad' },
+  { id: 'cambios', titulo: 'Cambios en estos términos' },
+];
+---
+<Legal titulo="Términos" icono="espada" actualizado="3 de noviembre de 2026" minutos={4} secciones={secciones} descripcion="Las reglas del juego fuera del juego: qué ofrecemos, qué esperamos de ti y qué pasa si algo falla.">
+  <A n={1} id="servicio" titulo="Qué es AetdraMC">
+    <p class="destacado">AetdraMC es un servidor de Minecraft Java con modo Survival, y aetdramc.live es su web oficial.</p>
+    <p>Jugar es gratis. Al conectarte al servidor, entrar en nuestro Discord o usar esta web, aceptas estos términos, el <a href="/reglamento">reglamento</a> y la <a href="/privacidad">política de privacidad</a>.</p>
+  </A>
+  <A n={2} id="cuenta" titulo="Tu cuenta">
+    <ul>
+      <li>Eres responsable de todo lo que ocurra con tu nick, aunque se lo prestes a otra persona.</li>
+      <li>Si no eres premium, protege tu nick con <code>/register</code> y una contraseña que no uses en otro sitio. El equipo nunca te la pedirá.</li>
+      <li>No está permitido comprar, vender ni intercambiar cuentas.</li>
+      <li>No puedes usar otras cuentas para evitar una sanción.</li>
+    </ul>
+  </A>
+  <A n={3} id="conducta" titulo="Conducta y sanciones">
+    <p>Debes cumplir el <a href="/reglamento">reglamento</a>. Si no lo haces, el equipo puede avisarte, silenciarte, expulsarte o bloquear tu acceso de forma temporal o permanente, según la gravedad.</p>
+    <p>Si crees que una sanción es injusta, puedes pedir que la revisemos en nuestro <a href={site.discord}>Discord</a>.</p>
+  </A>
+  <A n={4} id="progreso" titulo="Objetos y progreso">
+    <ul>
+      <li>El dinero, los objetos, los rangos y el progreso del juego no tienen valor real y no se pueden cambiar por dinero.</li>
+      <li>Podemos reiniciar mundos o ajustar la economía para mantener el servidor equilibrado. Avisaremos con antelación siempre que podamos.</li>
+      <li>Si un error te quita objetos, podemos devolverlos cuando haya registros que lo demuestren.</li>
+    </ul>
+  </A>
+  <A n={5} id="compras" titulo="Compras">
+    <p>Ahora mismo no vendemos nada. Cuando abra la tienda, añadiremos aquí sus condiciones, incluidos los reembolsos, antes de aceptar ningún pago.</p>
+  </A>
+  <A n={6} id="propiedad" titulo="Propiedad intelectual">
+    <p>Minecraft es una marca de Mojang AB. AetdraMC no está afiliado a Mojang ni a Microsoft.</p>
+    <p>El nombre, el logo, los textos y las imágenes propias de AetdraMC pertenecen a sus autores. No los uses sin permiso.</p>
+  </A>
+  <A n={7} id="disponibilidad" titulo="Disponibilidad y responsabilidad">
+    <ul>
+      <li>Hacemos lo posible para que el servidor funcione siempre, pero puede haber caídas, reinicios o mantenimiento.</li>
+      <li>El servicio se ofrece tal como está, sin garantías de disponibilidad ni de ausencia de errores.</li>
+    </ul>
+  </A>
+  <A n={8} id="cambios" titulo="Cambios en estos términos">
+    <p>Podemos actualizar estos términos. Cambiaremos la fecha de arriba y avisaremos de los cambios importantes en <a href={site.discord}>Discord</a>.</p>
+  </A>
+</Legal>

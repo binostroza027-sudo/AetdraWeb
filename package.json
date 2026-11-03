@@ -1,0 +1,27 @@
+{
+  "name": "aetdraweb",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/binostroza027-sudo/AetdraWeb.git"
+  },
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/binostroza027-sudo/AetdraWeb/issues"
+  },
+  "homepage": "https://github.com/binostroza027-sudo/AetdraWeb#readme",
+  "dependencies": {
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@fontsource/lilita-one": "^5.3.0",
+    "astro": "^7.4.5"
+  },
+  "devDependencies": {
+    "wrangler": "^4.156.2"
+  }
+}

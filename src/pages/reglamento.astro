@@ -1,0 +1,33 @@
+---
+import { Image } from 'astro:assets';
+import renderPagina from '../assets/render-reglamento.webp';
+import Base from '../layouts/Base.astro';
+import Pixel from '../components/Pixel.astro';
+import { site } from '../site';
+
+const reglas = [
+  ['Respeta a los jugadores', 'Sin acoso, amenazas ni discriminación.'],
+  ['Juega limpio', 'Sin cheats, duplicaciones ni explotación de errores.'],
+  ['Respeta las zonas', 'Cumple las zonas protegidas y las normas de combate.'],
+  ['Sin spam', 'Evita el spam y la publicidad de otros servidores.'],
+];
+---
+<Base titulo="Reglamento" descripcion="Reglas del Survival de AetdraMC.">
+  <h1>Reglamento</h1>
+  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de ElVenjo" width={360} />
+  <p class="intro">Las reglas del Survival. También puedes verlas dentro del juego con <code>/rules</code>.</p>
+  <ol class="reglas">
+    {reglas.map(([t, d], i) => (
+      <li class="card"><span class="num">{i + 1}</span><div><h2>{t}</h2><p>{d}</p></div></li>
+    ))}
+  </ol>
+  <p class="ayuda"><Pixel nombre="antorcha" tam={10} /> ¿Necesitas ayuda? Usa <code>/helpop</code> o entra en nuestro <a href={site.discord}>Discord</a>.</p>
+</Base>
+
+<style>
+  .reglas { list-style: none; display: grid; gap: 12px; max-width: 760px; margin: 0; padding: 0; }
+  .card { display: flex; gap: 18px; align-items: center; padding: 20px 24px; }
+  .card h2 { margin: 0 0 2px; font-size: 1.25rem; text-transform: uppercase; }
+  .card p { margin: 0; }
+  .ayuda { margin-top: 28px; }
+</style>

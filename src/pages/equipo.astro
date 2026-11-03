@@ -1,0 +1,48 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { rangos } from '../equipo';
+import Pixel from '../components/Pixel.astro';
+
+const total = rangos.reduce((n, r) => n + r.miembros.length, 0);
+---
+<Base titulo="Equipo" descripcion="El equipo que mantiene AetdraMC.">
+  <p class="etiqueta">El equipo</p>
+  <h1>Quién aviva <em>la llama</em></h1>
+  <p class="intro">Las personas que mantienen AetdraMC en marcha y cuidan de la comunidad.</p>
+  <p class="contador"><span class="etiqueta">{total} en el equipo</span></p>
+
+  {rangos.map((r) => (
+    <section class={`rango ${r.clase}`}>
+      <h2><Pixel nombre={r.icono} tam={30} />{r.nombre}<small>{r.miembros.length} {r.miembros.length === 1 ? 'miembro' : 'miembros'}</small></h2>
+      <div class="miembros">
+        {r.miembros.map((m) => (
+          <article class="miembro">
+            <div class="foto">
+              <Image src={m.render} alt={`Render de la skin de ${m.nick}`} width={360} />
+            </div>
+            <h3>{m.nick}</h3>
+            <span class="chip">{r.nombre}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+</Base>
+
+<style>
+  h1 em { font-style: normal; color: var(--fire); }
+  .contador { margin: -12px 0 48px; }
+  .rango { margin-bottom: 48px; }
+  .r-owner { --rango: #e8231a; }
+  .r-admin { --rango: #ff8a1f; }
+  .rango h2 { display: flex; align-items: center; gap: 12px; font-size: 1.7rem; text-transform: uppercase; margin-bottom: 18px; }
+  .rango small { font: 800 .9rem 'Nunito Variable', sans-serif; color: var(--muted); text-transform: none; }
+  .miembros { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .miembro { background: var(--panel); clip-path: var(--pix); padding: 0 0 18px; transition: transform .15s steps(3); }
+  .miembro:hover { transform: translateY(-4px); }
+  .foto { height: 250px; display: grid; place-items: end center; padding-top: 18px; background: var(--pixels), radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--rango) 85%, #fff), var(--rango) 40%, color-mix(in srgb, var(--rango) 45%, #000) 100%); }
+  .foto img { height: 220px; width: auto; max-width: 90%; object-fit: contain; filter: drop-shadow(0 12px 10px rgb(0 0 0 / .45)); }
+  .miembro h3 { font-size: 1.3rem; margin: 14px 18px 6px; }
+  .chip { margin-left: 18px; display: inline-block; padding: 2px 10px; background: var(--rango); color: var(--ink); font: .78rem var(--display); letter-spacing: .05em; text-transform: uppercase; clip-path: var(--pix); }
+</style>

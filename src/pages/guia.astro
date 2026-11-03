@@ -1,0 +1,159 @@
+---
+import Legal from '../layouts/Legal.astro';
+import A from '../components/Apartado.astro';
+import Pixel from '../components/Pixel.astro';
+import { site } from '../site';
+
+const secciones = [
+  { id: 'entrar', titulo: 'Entra al servidor' },
+  { id: 'primeros', titulo: 'Tus primeros minutos' },
+  { id: 'base', titulo: 'Protege tu base' },
+  { id: 'dinero', titulo: 'Gana tu primer dinero' },
+  { id: 'clan', titulo: 'Forma un clan' },
+  { id: 'pvp', titulo: 'PvP, KOTH y eventos' },
+  { id: 'progreso', titulo: 'Sube de nivel' },
+  { id: 'normas', titulo: 'Normas que no te puedes saltar' },
+  { id: 'dudas', titulo: 'Dudas rápidas' },
+  { id: 'seguir', titulo: 'Para seguir' },
+];
+const dudas = [
+  ['Me mataron y perdí mis cosas, ¿me las devolvéis?', 'Si fue por un error del servidor, sí: pide ayuda con /helpop o en Discord y lo revisamos en los registros. Si fue en combate, forma parte del juego.'],
+  ['Alguien rompió mi casa, ¿qué hago?', 'Si estaba dentro de tus tierras, nadie sin permiso puede tocarla. Si no lo estaba, avisa al equipo: podemos revisar quién fue y revertir el daño.'],
+  ['¿Cómo reporto a alguien?', 'Usa /helpop con el nick y lo que pasó, o abre un ticket en Discord con capturas.'],
+  ['Olvidé mi contraseña', 'Pide ayuda en Discord desde tu cuenta. Nunca compartas tu contraseña con nadie, ni siquiera con el equipo.'],
+  ['¿Dónde veo todos los comandos?', 'En la página de comandos, agrupados por tema. Y dentro del juego, /menu te lleva a casi todo.'],
+];
+---
+<Legal titulo="Guía del servidor" etiqueta="Guía completa" icono="pico" actualizado="3 de noviembre de 2026" minutos={7} secciones={secciones} descripcion="Todo lo que necesitas para empezar en AetdraMC: desde entrar por primera vez hasta tu primer clan.">
+  <A n={1} id="entrar" titulo="Entra al servidor">
+    <p class="destacado">Solo necesitas Minecraft Java y la IP del servidor.</p>
+    <div class="edicion">
+      <h3>Java <small>PC</small></h3>
+      <div class="ip"><span>{site.ip}</span><button class="btn oscuro copiar" data-ip={site.ip}>Copiar IP</button></div>
+      <ol class="pasos">
+        <li><span class="n">1</span><span>Abre Multijugador.</span></li>
+        <li><span class="n">2</span><span>Pulsa Añadir servidor y pega la IP.</span></li>
+        <li><span class="n">3</span><span>Haz doble clic en el servidor y entra.</span></li>
+        <li><span class="n">4</span><span>Si no eres premium, crea tu cuenta con <code>/register</code>. Las siguientes veces, usa <code>/login</code>.</span></li>
+      </ol>
+    </div>
+    <p>Al entrar aparecerás en el Lobby. Desde allí pasas al Survival, el modo principal. Cuando llegues, acepta el pack de texturas: sin él no verás bien los objetos y menús propios del servidor.</p>
+  </A>
+
+  <A n={2} id="primeros" titulo="Tus primeros minutos">
+    <ul>
+      <li><b>Abre <code>/menu</code>.</b> Desde ahí llegas a casi todo: destinos, cosméticos, suerte y ajustes.</li>
+      <li><b>Reclama tu kit de inicio</b> con <code>/kit</code>. Solo se entrega una vez.</li>
+      <li><b>Busca dónde instalarte</b> con <code>/rtp</code>, que te lleva a un lugar aleatorio lejos del spawn.</li>
+      <li><b>Guarda tu casa</b> con <code>/sethome</code> y vuelve cuando quieras con <code>/home</code>.</li>
+      <li><b>¿Te perdiste?</b> <code>/spawn</code> te devuelve al inicio y <code>/back</code> al último sitio donde estuviste.</li>
+    </ul>
+  </A>
+
+  <A n={3} id="base" titulo="Protege tu base">
+    <p class="destacado">Lo que no está protegido, cualquiera puede romperlo. Reclama tu zona antes de construir algo grande.</p>
+    <ul>
+      <li><code>/lands</code> abre el menú para crear tus tierras.</li>
+      <li><code>/claim</code> reclama el trozo de terreno donde estás; <code>/unclaim</code> lo libera.</li>
+      <li><code>/trust nick</code> deja construir a un amigo; <code>/untrust nick</code> le quita el permiso.</li>
+      <li><code>/view</code> te muestra los límites de tus tierras.</li>
+    </ul>
+  </A>
+
+  <A n={4} id="dinero" titulo="Gana tu primer dinero">
+    <div class="tarjetas">
+      <div class="card"><Pixel nombre="pico" tam={28} /><h3>Trabajos</h3><p>Elige entre 10 oficios con <code>/jobs</code>, como minero, leñador o granjero, y cobra por lo que ya haces.</p></div>
+      <div class="card"><Pixel nombre="libro" tam={28} /><h3>Misiones</h3><p>Completa misiones diarias, semanales y mensuales con <code>/quests</code>.</p></div>
+      <div class="card"><Pixel nombre="reloj" tam={28} /><h3>Recompensas</h3><p>Reclama premios por tiempo de juego y por días seguidos con <code>/rewards</code>.</p></div>
+      <div class="card"><Pixel nombre="esmeralda" tam={28} /><h3>Comercio</h3><p>Vende en la tienda del servidor con <code>/shop</code> o subasta tus objetos con <code>/ah</code>.</p></div>
+    </div>
+    <p>Consulta tu saldo con <code>/bal</code>, paga a otros con <code>/pay</code> y mira a los más ricos con <code>/baltop</code>.</p>
+  </A>
+
+  <A n={5} id="clan" titulo="Forma un clan">
+    <p>Tus tierras son también tu clan: invita a tus amigos, repartid roles y haced crecer vuestra zona juntos.</p>
+    <ul>
+      <li>Varias tierras pueden unirse en una <b>nación</b> con <code>/nations</code>.</li>
+      <li>Las naciones pueden aliarse o declararse la <b>guerra</b>.</li>
+    </ul>
+  </A>
+
+  <A n={6} id="pvp" titulo="PvP, KOTH y eventos">
+    <ul>
+      <li><b>Protección de novato:</b> al empezar tienes un tiempo sin PvP. Consulta tu estado con <code>/pvpstatus</code>.</li>
+      <li><b>Etiqueta de combate:</b> si te desconectas en mitad de una pelea, lo pagas. Termina lo que empiezas.</li>
+      <li><b>KOTH:</b> captura la zona central y defiéndela. Mira el evento con <code>/koth</code>.</li>
+      <li><b>Suministros:</b> caen cofres con premios por el mundo; llega antes que nadie. Más con <code>/envoy</code>.</li>
+      <li><b>Recompensas por cabeza:</b> pon precio a la cabeza de alguien con <code>/bounty</code>.</li>
+      <li><b>Juegos en el chat:</b> sé el más rápido escribiendo y suma puntos.</li>
+    </ul>
+  </A>
+
+  <A n={7} id="progreso" titulo="Sube de nivel">
+    <ul>
+      <li><b>Cajas:</b> gana llaves jugando y ábrelas desde <code>/suerte</code>: Aventura, KOTH, Legado y Oficios.</li>
+      <li><b>Encantamientos propios:</b> visita al encantador con <code>/enchanter</code>.</li>
+      <li><b>Granjas:</b> mejora tus granjas y tolvas con <code>/farms</code> y <code>/hopper</code>.</li>
+      <li><b>Estaciones:</b> el mundo pasa por primavera, verano, otoño e invierno. Mira la actual con <code>/season</code>.</li>
+      <li><b>Cosméticos:</b> mascotas, partículas y más desde <code>/cosmeticos</code>.</li>
+    </ul>
+  </A>
+
+  <A n={8} id="normas" titulo="Normas que no te puedes saltar">
+    <ol class="pasos">
+      <li><span class="n">1</span><span>Respeta a los jugadores: sin acoso, amenazas ni discriminación.</span></li>
+      <li><span class="n">2</span><span>Juega limpio: sin cheats, duplicaciones ni explotación de errores.</span></li>
+      <li><span class="n">3</span><span>Respeta las zonas protegidas y las normas de combate.</span></li>
+      <li><span class="n">4</span><span>Evita el spam y la publicidad de otros servidores.</span></li>
+    </ol>
+    <p>Lee el <a href="/reglamento">reglamento</a> completo. Dentro del juego lo tienes con <code>/rules</code>.</p>
+  </A>
+
+  <A n={9} id="dudas" titulo="Dudas rápidas">
+    <div class="dudas">
+      {dudas.map(([p, r]) => <details><summary>{p}</summary><p>{r}</p></details>)}
+    </div>
+  </A>
+
+  <A n={10} id="seguir" titulo="Para seguir">
+    <div class="tarjetas">
+      <a class="card" href="/comandos"><Pixel nombre="cofre" tam={28} /><h3>Comandos</h3><p>Todos los comandos por tema.</p></a>
+      <a class="card" href="/novedades"><Pixel nombre="libro" tam={28} /><h3>Novedades</h3><p>Lo último que cambió en el servidor.</p></a>
+      <a class="card" href={site.discord}><Pixel nombre="corazon" tam={28} /><h3>Discord</h3><p>Avisos, ayuda y comunidad.</p></a>
+    </div>
+  </A>
+</Legal>
+
+<style>
+  .edicion { background: var(--panel); clip-path: var(--pix); border-top: 4px solid var(--fire); padding: 22px 24px; margin: 18px 0 24px; max-width: 460px; }
+  .edicion h3 { margin: 0 0 14px; font-size: 1.5rem; text-transform: uppercase; }
+  .edicion small { font: 700 .85rem 'Nunito Variable', sans-serif; color: var(--muted); text-transform: none; }
+  .ip { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; background: var(--cream); color: var(--ink); clip-path: var(--pix); padding: 7px 7px 7px 16px; font: 1.2rem var(--display); overflow-wrap: anywhere; }
+  .ip .btn { padding: 9px 16px 13px; font-size: .9rem; }
+  .pasos { list-style: none; padding: 0; margin: 18px 0 0; }
+  .pasos li { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; font-weight: 700; }
+  .n { flex: none; display: grid; place-items: center; width: 26px; height: 26px; background: var(--fire); color: var(--ink); font: .95rem var(--display); clip-path: var(--pix); }
+  .tarjetas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin: 16px 0; }
+  .tarjetas .card { padding: 20px; }
+  .tarjetas h3 { font-size: 1.15rem; text-transform: uppercase; margin: 10px 0 4px; }
+  .dudas { display: grid; gap: 10px; }
+  .dudas details { background: var(--panel); clip-path: var(--pix); padding: 4px 20px; }
+  .dudas summary { cursor: pointer; padding: 12px 0; font: 1.05rem var(--display); }
+  .dudas summary::marker { color: var(--fire); }
+  .dudas p { margin: 0 0 14px; color: var(--muted); }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.copiar').forEach((boton) => {
+    boton.addEventListener('click', async () => {
+      const original = boton.textContent;
+      try {
+        await navigator.clipboard.writeText(boton.dataset.ip ?? '');
+        boton.textContent = '¡Copiada!';
+      } catch {
+        boton.textContent = 'Cópiala a mano';
+      }
+      setTimeout(() => { boton.textContent = original; }, 1800);
+    });
+  });
+</script>

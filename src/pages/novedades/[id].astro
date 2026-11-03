@@ -1,0 +1,21 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { fecha, novedadesPublicadas } from '../../novedades';
+
+export async function getStaticPaths() {
+  const lista = await novedadesPublicadas();
+  return lista.map((entrada) => ({ params: { id: entrada.id }, props: { entrada } }));
+}
+const { entrada } = Astro.props;
+const { Content } = await render(entrada);
+---
+<Base titulo={entrada.data.titulo} descripcion={entrada.data.resumen}>
+  <article class="prose">
+    <a href="/novedades">← Novedades</a>
+    <p><span class="etiqueta">{entrada.data.categoria}</span></p>
+    <h1>{entrada.data.titulo}</h1>
+    <time datetime={entrada.data.fecha.toISOString()}>{fecha.format(entrada.data.fecha)}</time>
+    <Content />
+  </article>
+</Base>

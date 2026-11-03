@@ -1,0 +1,35 @@
+﻿---
+import Base from '../layouts/Base.astro';
+import { site } from '../site';
+---
+<Base titulo="Estado" descripcion="Comprueba si AetdraMC está en línea y cuántos jugadores hay.">
+  <h1>Estado</h1>
+  <div class="card estado" id="estado" data-ip={site.ip} aria-live="polite">
+    <h2 id="estado-titulo">Comprobando…</h2>
+    <p id="estado-detalle">{site.ip}</p>
+  </div>
+</Base>
+
+<style>
+  .estado { max-width: 480px; }
+</style>
+
+<script>
+  const caja = document.getElementById('estado');
+  const titulo = document.getElementById('estado-titulo');
+  const detalle = document.getElementById('estado-detalle');
+  try {
+    const r = await fetch(`https://api.mcsrvstat.us/3/${caja?.dataset.ip}`);
+    if (!r.ok) throw new Error(String(r.status));
+    const d = await r.json();
+    if (titulo && detalle) {
+      titulo.textContent = d.online ? 'En línea' : 'Fuera de línea';
+      detalle.textContent = d.online ? `${d.players?.online ?? 0} jugando ahora` : 'Vuelve a intentarlo en unos minutos o pregunta en Discord.';
+    }
+  } catch {
+    if (titulo && detalle) {
+      titulo.textContent = 'Estado no disponible';
+      detalle.textContent = 'No se pudo comprobar el servidor ahora mismo.';
+    }
+  }
+</script>

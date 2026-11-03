@@ -1,0 +1,283 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import logo from '../assets/logo.png';
+import renderSurvival from '../assets/render-survival.webp';
+import renderPasos from '../assets/render-pasos.webp';
+import renderComunidad from '../assets/render-comunidad.webp';
+import renderTops from '../assets/render-tops.webp';
+import renderPreguntas from '../assets/render-preguntas.webp';
+import { fecha, novedadesPublicadas } from '../novedades';
+import { site } from '../site';
+import Pixel from '../components/Pixel.astro';
+
+const ultimas = (await novedadesPublicadas()).slice(0, 3);
+const mundo = [
+  ['bandera', 'Clanes y naciones', 'Reclama tu zona, invita a amigos y compite en guerras.'],
+  ['corona', 'KOTH', 'Captura la zona central y sube en el ranking.'],
+  ['pico', 'Trabajos', 'Elige entre 10 oficios, sube de nivel y gana dinero.'],
+  ['esmeralda', 'Economía', 'Tienda, subastas y pagos entre jugadores.'],
+  ['hoja', 'Estaciones', 'Primavera, verano, otoño e invierno, con temperatura y eventos propios.'],
+  ['cofre', 'Cajas', 'Consigue llaves jugando y abre cajas Aventura, KOTH, Legado y Oficios.'],
+];
+const extras = ['Misiones', 'Suministros', 'Granjas', 'Encantamientos', 'Cosméticos', 'Recompensas por cabeza', 'Juegos en el chat', 'Kits'];
+const pasos = [
+  ['Abre Minecraft', 'Inicia Minecraft Java y entra en Multijugador.'],
+  ['Añade el servidor', `Pulsa Añadir servidor y escribe ${site.ip}.`],
+  ['A jugar', 'Entra y, si no eres premium, regístrate con /register.'],
+];
+const preguntas = [
+  ['¿Necesito una cuenta premium?', 'No. Si no eres premium, crea tu cuenta con /register al entrar y usa /login las siguientes veces.'],
+  ['¿Puedo entrar desde Bedrock?', 'Por ahora, anunciamos AetdraMC para Minecraft Java.'],
+  ['¿Tengo que registrarme en la web?', 'No. La web no tiene cuentas: todo se hace dentro del juego.'],
+  ['¿Por qué me pide descargar un pack?', 'El Survival usa un pack de texturas propio. Acéptalo para ver bien sus objetos y menús.'],
+  ['¿Dónde pido ayuda?', 'En nuestro Discord: el equipo y la comunidad te echarán una mano.'],
+];
+---
+<Base completo>
+  <section class="hero">
+    <canvas id="brasas" aria-hidden="true"></canvas>
+    <div class="contenedor centro">
+      <Image class="zorro" src={logo} alt="Logo de AetdraMC: un zorro naranja de estilo pixelado" width={640} />
+      <h1>Tu aventura arde aquí</h1>
+      <div class="ip">
+        <span>{site.ip}</span>
+        <button class="btn oscuro copiar" data-ip={site.ip}>Copiar IP</button>
+      </div>
+      <p class="pista" role="status"></p>
+      <div class="barra-objetos" aria-hidden="true">
+        {['espada', 'pico', 'bloque', 'antorcha', 'cofre', 'esmeralda', 'corazon', 'libro', 'reloj'].map((ic, i) => (
+          <span class:list={['slot', { activo: i === 0 }]}><Pixel nombre={ic} tam={28} /></span>
+        ))}
+      </div>
+    </div>
+  </section>
+  <div class="escalon" aria-hidden="true"></div>
+
+  <section class="contenedor datos" aria-label="Datos del servidor">
+    <div><Pixel nombre="corazon" tam={28} /><b id="jugadores">–</b><span>jugando ahora</span></div>
+    <div><Pixel nombre="pico" tam={28} /><b>10</b><span>oficios</span></div>
+    <div><Pixel nombre="bloque" tam={28} /><b>Java</b><span>edición</span></div>
+    <div><Pixel nombre="libro" tam={28} /><b>ES</b><span>idioma</span></div>
+  </section>
+
+  <section class="contenedor bloque revelar">
+    <h2 class="titulo">Un mundo que <em>no se detiene</em></h2>
+    <div class="mosaico">
+      <div class="card principal">
+        <span class="etiqueta">Modo principal</span>
+        <h3>Survival</h3>
+        <p>Construye tu base, forma tu clan, gana dinero con tu oficio y demuestra quién manda.</p>
+        <Image class="render-oro" src={renderSurvival} alt="Render de la skin de _Eonix" width={420} />
+      </div>
+      {mundo.map(([ic, t, d]) => (
+        <div class="card"><span class="slot"><Pixel nombre={ic} tam={30} /></span><h3>{t}</h3><p>{d}</p></div>
+      ))}
+    </div>
+    <ul class="extras">
+      {extras.map((e) => <li class="etiqueta">{e}</li>)}
+    </ul>
+  </section>
+
+  <section class="contenedor bloque revelar">
+    <div class="cabecera-pasos">
+      <h2 class="titulo">Entra en <em>tres pasos</em></h2>
+      <Image class="render-barca" src={renderPasos} alt="Render de la skin de Meliinoeee" width={420} />
+    </div>
+    <ol class="pasos">
+      {pasos.map(([t, d], i) => (
+        <li><span class="num">{i + 1}</span><h3>{t}</h3><p>{d}</p></li>
+      ))}
+    </ol>
+    <p class="mas-guia"><a class="btn" href="/guia">Ver la guía completa</a></p>
+  </section>
+
+  <section class="contenedor bloque doble revelar">
+    <div>
+      <h2 class="titulo"><Pixel nombre="libro" tam={34} />Novedades</h2>
+      <div class="lista">
+        {ultimas.map((n) => (
+          <a class="card" href={`/novedades/${n.id}`}>
+            <span class="etiqueta">{n.data.categoria}</span>
+            <h3>{n.data.titulo}</h3>
+            <p>{n.data.resumen}</p>
+            <time datetime={n.data.fecha.toISOString()}>{fecha.format(n.data.fecha)}</time>
+          </a>
+        ))}
+      </div>
+      <a class="btn" href="/novedades">Ver todas</a>
+    </div>
+    <div>
+      <div class="cabecera-pasos">
+        <h2 class="titulo"><Pixel nombre="corona" tam={38} />Tops</h2>
+        <Image class="render-mini" src={renderTops} alt="Render de la skin de Meliinoeee" width={300} />
+      </div>
+      <ol class="podio" aria-label="Clasificación todavía sin datos">
+        <li><span class="num">1</span>Próximamente</li>
+        <li><span class="num">2</span>Próximamente</li>
+        <li><span class="num">3</span>Próximamente</li>
+      </ol>
+      <a class="btn" href="/tops">Ver los tops</a>
+    </div>
+  </section>
+
+  <section class="contenedor bloque revelar">
+    <h2 class="titulo">Preguntas <em>frecuentes</em></h2>
+    <div class="faq">
+    <div class="preguntas">
+      {preguntas.map(([p, r]) => (
+        <details><summary>{p}</summary><p>{r}</p></details>
+      ))}
+    </div>
+    <Image class="render-preguntas" src={renderPreguntas} alt="Render de la skin de Meliinoeee" width={520} />
+    </div>
+  </section>
+
+  <div class="escalon invertido" aria-hidden="true"></div>
+  <section class="comunidad">
+    <div class="contenedor comunidad-grid revelar">
+      <div>
+        <h2 class="titulo">Únete a la comunidad</h2>
+        <p>Avisos, ayuda y gente con la que jugar, en nuestro Discord.</p>
+        <a class="btn oscuro" href={site.discord}>Entrar a Discord</a>
+      </div>
+      <Image class="render-saludo" src={renderComunidad} alt="Render de la skin de _Eonix" width={420} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 36px 0 40px;
+    background: var(--pixels), radial-gradient(ellipse at 50% 35%, #ffa41c, var(--fire) 36%, var(--red) 72%, var(--deep));
+  }
+  #brasas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .centro { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .zorro { width: min(420px, 82vw); height: auto; display: block; filter: drop-shadow(0 16px 22px rgb(40 5 0 / .55)); animation: flotar 5s ease-in-out infinite; }
+  @keyframes flotar { 50% { transform: translateY(-10px); } }
+  h1 { font-size: clamp(2.4rem, 7vw, 4.6rem); margin: 18px 0 22px; text-shadow: 0 5px 0 var(--deep); }
+  .ip { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 20px; background: var(--cream); color: var(--ink); clip-path: var(--pix); padding: 9px 9px 9px 22px; font: 1.35rem var(--display); overflow-wrap: anywhere; }
+  .pista { min-height: 1.6em; margin: 8px 0 0; font-size: .92rem; font-weight: 800; }
+  .escalon { height: 24px; background: linear-gradient(90deg, var(--deep) 50%, transparent 0) 0 0 / 48px 12px repeat-x, linear-gradient(90deg, transparent 50%, var(--deep) 0) 0 12px / 48px 12px repeat-x; }
+  .escalon.invertido { background: linear-gradient(90deg, transparent 50%, var(--red) 0) 0 0 / 48px 12px repeat-x, linear-gradient(90deg, var(--red) 50%, transparent 0) 0 12px / 48px 12px repeat-x; }
+  .datos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 32px 0 72px; }
+  .datos div { background: var(--panel); clip-path: var(--pix); padding: 16px; text-align: center; }
+  .datos b { display: block; color: var(--gold); font: 2rem/1.2 var(--display); font-weight: 400; }
+  .datos span { color: var(--muted); font-size: .9rem; }
+  .bloque { padding-bottom: 80px; }
+  .titulo { font-size: clamp(2rem, 5vw, 3.2rem); text-transform: uppercase; margin: 0 0 24px; }
+  .titulo em { font-style: normal; color: var(--fire); }
+  .mosaico { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .mosaico .card { padding: 22px; }
+  @media (min-width: 861px) { .mosaico .card:nth-last-child(-n + 2) { grid-column: span 2; } }
+  .card h3 { font-size: 1.3rem; margin: 10px 0 6px; text-transform: uppercase; }
+  .principal { grid-column: span 2; grid-row: span 2; background: var(--pixels), linear-gradient(145deg, var(--red), var(--fire)); }
+  .principal h3 { font-size: clamp(2.4rem, 5vw, 3.6rem); margin: 16px 0 10px; }
+  .card.principal p { color: var(--text); font-size: 1.1rem; }
+  .slot { display: inline-grid; place-items: center; width: 48px; height: 48px; background: #8b8b8b; box-shadow: inset 3px 3px 0 #373737, inset -3px -3px 0 #fff; }
+  .barra-objetos { display: flex; gap: 0; margin-top: 18px; padding: 4px; background: rgb(20 8 4 / .7); }
+  .barra-objetos .slot { width: 46px; height: 46px; margin: 2px; background: rgb(139 139 139 / .55); box-shadow: inset 2px 2px 0 rgb(55 55 55 / .8), inset -2px -2px 0 rgb(255 255 255 / .5); }
+  .barra-objetos .slot.activo { outline: 4px solid #fff; outline-offset: -1px; }
+  .datos .pixel { display: block; margin: 0 auto 6px; }
+  .titulo .pixel { vertical-align: -2px; margin-right: 12px; }
+  @media (max-width: 560px) { .barra-objetos .slot:nth-child(n + 6) { display: none; } }
+  .extras { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 0; padding: 0; }
+  .pasos { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0; margin: 0; }
+  .pasos li { background: var(--panel); clip-path: var(--pix); padding: 24px; overflow-wrap: anywhere; }
+  .mas-guia { margin: 22px 0 0; }
+  .pasos h3 { font-size: 1.3rem; margin: 14px 0 6px; text-transform: uppercase; }
+  .pasos p { margin: 0; color: var(--muted); }
+  .doble { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
+  .lista { display: grid; gap: 14px; margin-bottom: 22px; }
+  .podio { list-style: none; margin: 0 0 22px; padding: 10px 24px; background: var(--panel); clip-path: var(--pix); }
+  .podio li { display: flex; align-items: center; gap: 16px; padding: 12px 0; color: var(--muted); font: 1.1rem var(--display); }
+  .podio li + li .num { background: var(--gold); }
+  .preguntas { display: grid; gap: 10px; max-width: 800px; }
+  details { background: var(--panel); clip-path: var(--pix); padding: 4px 22px; }
+  summary { cursor: pointer; padding: 12px 0; font: 1.1rem var(--display); }
+  summary::marker { color: var(--fire); }
+  details p { margin: 0 0 14px; color: var(--muted); }
+  .comunidad { padding: 40px 0 0; overflow: hidden; background: var(--pixels), linear-gradient(115deg, var(--red), var(--fire)); }
+  .comunidad-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: end; }
+  .comunidad-grid > div { align-self: center; padding-bottom: 40px; }
+  .render-saludo { width: auto; max-width: 100%; height: 320px; object-fit: contain; display: block; margin: auto auto 0; filter: drop-shadow(0 0 30px rgb(255 244 228 / .45)); }
+  .render-oro { display: block; width: auto; max-width: 52%; height: 300px; object-fit: contain; margin: 10px 0 -26px auto; filter: drop-shadow(0 0 26px rgb(255 214 120 / .55)); }
+  .cabecera-pasos { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
+  .render-mini { width: auto; max-width: 34%; height: 170px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 0 26px rgb(255 182 39 / .5)); }
+  .faq { display: grid; grid-template-columns: 1fr 260px; gap: 32px; align-items: center; }
+  .render-preguntas { width: 100%; height: 300px; object-fit: contain; filter: drop-shadow(0 0 30px rgb(255 106 19 / .4)); }
+  .render-barca { width: auto; max-width: 38%; height: 230px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 0 30px rgb(255 106 19 / .5)); }
+  .comunidad .titulo { margin-bottom: 8px; }
+  .comunidad p { margin: 0 0 24px; }
+  @media (max-width: 860px) {
+    .mosaico { grid-template-columns: repeat(2, 1fr); }
+    .pasos, .doble, .comunidad-grid, .faq { grid-template-columns: 1fr; }
+    .render-preguntas { display: none; }
+  }
+  @media (max-width: 560px) {
+    .datos { grid-template-columns: repeat(2, 1fr); padding-bottom: 56px; }
+    .mosaico { grid-template-columns: 1fr; }
+    .principal { grid-column: auto; grid-row: auto; }
+    .ip { padding: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .zorro { animation: none; } }
+</style>
+
+<script>
+  import { site } from '../site';
+
+  document.querySelectorAll<HTMLButtonElement>('.copiar').forEach((boton) => {
+    const pista = boton.closest('.centro')?.querySelector('.pista');
+    boton.addEventListener('click', async () => {
+      const original = boton.textContent;
+      try {
+        await navigator.clipboard.writeText(boton.dataset.ip ?? '');
+        boton.textContent = '¡Copiada!';
+        setTimeout(() => { boton.textContent = original; }, 1800);
+      } catch {
+        if (pista) pista.textContent = 'No se pudo copiar. Escríbela a mano.';
+      }
+    });
+  });
+
+  const jugadores = document.getElementById('jugadores');
+  fetch(`https://api.mcsrvstat.us/3/${site.ip}`)
+    .then((r) => r.json())
+    .then((d) => {
+      if (!d.online || !jugadores) return;
+      jugadores.textContent = String(d.players?.online ?? 0);
+    })
+    .catch(() => {});
+
+  const lienzo = document.getElementById('brasas') as HTMLCanvasElement | null;
+  const ctx = lienzo?.getContext('2d');
+  if (lienzo && ctx && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const ajustar = () => { lienzo.width = lienzo.clientWidth; lienzo.height = lienzo.clientHeight; };
+    addEventListener('resize', ajustar);
+    ajustar();
+    const nueva = (inicio = false) => ({
+      x: Math.random() * lienzo.width,
+      y: inicio ? Math.random() * lienzo.height : lienzo.height + 10,
+      t: 3 + Math.floor(Math.random() * 3) * 2,
+      v: 0.4 + Math.random() * 1.1,
+      f: Math.random() * 6,
+    });
+    const brasas = Array.from({ length: 45 }, () => nueva(true));
+    const dibujar = () => {
+      ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+      brasas.forEach((b, i) => {
+        b.y -= b.v;
+        b.f += 0.03;
+        b.x += Math.sin(b.f) * 0.4;
+        ctx.globalAlpha = Math.max(0, Math.min(1, b.y / lienzo.height + 0.15));
+        ctx.fillStyle = i % 3 ? '#ffd34d' : '#fff1c2';
+        ctx.fillRect(Math.round(b.x), Math.round(b.y), b.t, b.t);
+        if (b.y < -10) brasas[i] = nueva();
+      });
+      requestAnimationFrame(dibujar);
+    };
+    dibujar();
+  }
+</script>

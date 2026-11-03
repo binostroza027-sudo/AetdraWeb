@@ -1,0 +1,33 @@
+---
+import { Image } from 'astro:assets';
+import renderPagina from '../../assets/render-guias.webp';
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const lista = (await getCollection('guias')).sort((a, b) => a.data.orden - b.data.orden);
+---
+<Base titulo="Guías">
+  <h1>Guías</h1>
+  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de ElVenjo" width={360} />
+  <p class="intro">Todo lo que necesitas para empezar a jugar.</p>
+  <a class="destacada" href="/guia">
+    <span class="etiqueta">Empieza aquí</span>
+    <h2>Guía completa del servidor</h2>
+    <p>Desde entrar por primera vez hasta tu primer clan, en 10 apartados.</p>
+  </a>
+  <div class="grid">
+    {lista.map((g) => (
+      <a class="card" href={`/guias/${g.id}`}>
+        <h2>{g.data.titulo}</h2>
+        <p>{g.data.resumen}</p>
+      </a>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .destacada { display: block; margin-bottom: 18px; padding: 26px; color: var(--text); text-decoration: none; clip-path: var(--pix); background: var(--pixels), linear-gradient(115deg, var(--red), var(--fire)); }
+  .destacada h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); text-transform: uppercase; margin: 12px 0 6px; }
+  .destacada p { margin: 0; }
+  .destacada:hover { filter: brightness(1.08); }
+</style>

@@ -1,0 +1,29 @@
+---
+const { n, id, titulo } = Astro.props;
+const romano = (num: number) => {
+  const tabla: [number, string][] = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+  let r = '';
+  for (const [v, s] of tabla) while (num >= v) { r += s; num -= v; }
+  return r;
+};
+---
+<section id={id} class="capitulo">
+  <p class="num-cap">Capítulo {romano(n)}</p>
+  <h2>{titulo}</h2>
+  <slot />
+</section>
+
+<style>
+  .capitulo { padding-bottom: 28px; margin-bottom: 32px; scroll-margin-top: 90px; background: linear-gradient(90deg, transparent, #c9a676 20%, #c9a676 80%, transparent) bottom / 100% 2px no-repeat; }
+  .capitulo:last-child { background: none; margin-bottom: 0; }
+  .num-cap { margin: 0; font: .85rem var(--display); letter-spacing: .14em; text-transform: uppercase; color: #a23a0c; }
+  h2 { font-size: clamp(1.7rem, 4vw, 2.3rem); margin: 4px 0 14px; color: var(--tinta); text-shadow: none; }
+  .capitulo :global(.destacado) { font-weight: 800; font-size: 1.1rem; }
+  .capitulo :global(ul) { padding-left: 0; list-style: none; }
+  .capitulo :global(ul li) { position: relative; padding-left: 24px; margin-bottom: 8px; }
+  .capitulo :global(ul li::before) { content: '✦'; position: absolute; left: 0; color: #c94b00; }
+  .capitulo :global(table) { width: 100%; border-collapse: collapse; font-size: .95rem; background: rgb(255 255 255 / .35); }
+  .capitulo :global(th) { text-align: left; font: .8rem var(--display); letter-spacing: .06em; text-transform: uppercase; padding: 12px 14px; border-bottom: 2px solid #c9a676; }
+  .capitulo :global(td) { padding: 12px 14px; border-bottom: 1px dashed #c9a676; vertical-align: top; }
+  .capitulo :global(.tabla) { overflow-x: auto; }
+</style>

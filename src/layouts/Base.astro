@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import '@fontsource/lilita-one';
+import '@fontsource-variable/nunito';
+import logo from '../assets/logo.png';
+import { site } from '../site';
+import '../styles/global.css';
+
+const { titulo, descripcion = 'Servidor de Minecraft Java en español. Entra en play.aetdramc.live.', completo = false } = Astro.props;
+const menu = [
+  ['/', 'Inicio'],
+  ['/novedades', 'Novedades'],
+  ['/guias', 'Guías'],
+  ['/tops', 'Tops'],
+  ['/tienda', 'Tienda'],
+  ['/equipo', 'Equipo'],
+  ['/estado', 'Estado'],
+];
+const ruta = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo ? `${titulo} | ${site.nombre}` : site.nombre}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="icon" href="/favicon.png" />
+    <style>
+      .tira { background: #000; color: var(--muted); font-size: .85rem; }
+      .tira div { width: min(1100px, 100% - 32px); margin: auto; padding: 5px 0; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 16px; }
+      .tira b { color: var(--text); }
+      .tira a { color: var(--muted); }
+      header { position: sticky; top: 0; z-index: 10; background: rgb(12 6 5 / .88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+      .barra { width: min(1100px, 100% - 32px); margin: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; padding: 8px 0; }
+      .marca { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font: 1.4rem var(--display); }
+      .marca img { display: block; width: 46px; height: 46px; }
+      nav { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 2px 20px; flex: 1; }
+      nav a { color: var(--text); text-decoration: none; font: 1rem var(--display); letter-spacing: .03em; text-transform: uppercase; padding: 6px 0; border-bottom: 3px solid transparent; }
+      nav a:hover, nav a[aria-current] { color: var(--gold); border-color: var(--fire); }
+      @media (max-width: 720px) { nav { order: 3; flex-basis: 100%; justify-content: flex-start; gap: 2px 14px; } nav a { font-size: .88rem; } }
+      footer { border-top: 3px solid var(--fire); background: #070302; color: var(--muted); font-size: .95rem; }
+      .pie { width: min(1100px, 100% - 32px); margin: auto; padding: 40px 0 20px; display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+      .pie img { width: 110px; height: auto; display: block; }
+      .pie h3 { color: var(--text); margin: 0 0 8px; font-size: 1.05rem; text-transform: uppercase; }
+      .pie a { display: block; color: var(--muted); text-decoration: none; padding: 2px 0; }
+      .pie a:hover { color: var(--gold); }
+      .legal { width: min(1100px, 100% - 32px); margin: auto; padding: 14px 0 24px; border-top: 1px solid var(--line); font-size: .85rem; }
+    </style>
+  </head>
+  <body>
+    <div class="tira">
+      <div><span><b>aetdramc.live</b> · Minecraft Java</span><span><a href="/estado">Estado del servidor</a> · <a href={site.discord}>Discord</a></span></div>
+    </div>
+    <header>
+      <div class="barra">
+        <a class="marca" href="/"><Image src={logo} alt="" width={92} />AETDRA</a>
+        <nav aria-label="Principal">
+          {menu.map(([href, texto]) => <a href={href} aria-current={ruta === href ? 'page' : undefined}>{texto}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main class={completo ? 'completo' : undefined}><slot /></main>
+    <footer>
+      <div class="pie">
+        <Image src={logo} alt="" width={220} />
+        <div>
+          <h3>Servidor</h3>
+          <a href="/novedades">Novedades</a>
+          <a href="/tops">Tops</a>
+          <a href="/tienda">Tienda</a>
+          <a href="/estado">Estado</a>
+        </div>
+        <div>
+          <h3>Ayuda</h3>
+          <a href="/guias">Guías</a>
+          <a href="/reglamento">Reglamento</a>
+          <a href="/comandos">Comandos</a>
+          <a href="/no-premium">No premium</a>
+        </div>
+        <div>
+          <h3>Comunidad</h3>
+          <a href="/equipo">Equipo</a>
+          <a href={site.discord}>Discord</a>
+          <a href="/contacto">Contacto</a>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <a href="/terminos">Términos</a>
+          <a href="/privacidad">Privacidad</a>
+          <a href="/cookies">Cookies</a>
+        </div>
+      </div>
+      <p class="legal">© {new Date().getFullYear()} AetdraMC · Minecraft es una marca de Mojang AB. No estamos afiliados a Mojang ni a Microsoft.</p>
+    </footer>
+    <script>
+      const elementos = document.querySelectorAll('.revelar');
+      const observador = new IntersectionObserver((entradas) => {
+        for (const e of entradas) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            observador.unobserve(e.target);
+          }
+        }
+      }, { threshold: 0.12 });
+      elementos.forEach((el) => observador.observe(el));
+    </script>
+  </body>
+</html>

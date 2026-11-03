@@ -1,0 +1,120 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Pixel from '../../components/Pixel.astro';
+import { cambios, iconos, novedadesPublicadas } from '../../novedades';
+
+const lista = await novedadesPublicadas();
+const entradas = await Promise.all(lista.map(async (n) => ({ n, Content: (await render(n)).Content, total: cambios(n.body) })));
+const clave = (d: Date) => d.toISOString().slice(0, 10);
+
+const porDia = new Map<string, number>();
+for (const e of entradas) porDia.set(clave(e.n.data.fecha), (porDia.get(clave(e.n.data.fecha)) ?? 0) + e.total);
+const totalCambios = [...porDia.values()].reduce((a, b) => a + b, 0);
+
+// Mapa de las últimas 16 semanas hasta la entrada más reciente, de lunes a domingo.
+const SEMANAS = 16;
+const fin = lista[0]?.data.fecha ?? new Date();
+const lunesFin = new Date(Date.UTC(fin.getUTCFullYear(), fin.getUTCMonth(), fin.getUTCDate() - ((fin.getUTCDay() + 6) % 7)));
+const inicio = new Date(lunesFin.getTime() - (SEMANAS - 1) * 7 * 86400000);
+const celdas = Array.from({ length: SEMANAS * 7 }, (_, i) => {
+  const semana = Math.floor(i / 7);
+  const dia = i % 7;
+  const d = new Date(inicio.getTime() + (semana * 7 + dia) * 86400000);
+  const k = clave(d);
+  return { k, d, c: porDia.get(k) ?? 0, futuro: d > fin, semana, dia };
+}).sort((a, b) => a.dia - b.dia || a.semana - b.semana);
+const nivel = (c: number) => (c === 0 ? 0 : c <= 2 ? 1 : c <= 5 ? 2 : 3);
+const corta = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const categorias = [...new Set(lista.map((n) => n.data.categoria))];
+---
+<Base titulo="Novedades" descripcion="El diario de cambios de AetdraMC.">
+  <p class="etiqueta">Diario de cambios</p>
+  <h1>Novedades</h1>
+  <p class="intro">Cada mejora, evento y ajuste del servidor, anotado en su día.</p>
+
+  <section class="racha">
+    <div class="racha-cabecera">
+      <h2><Pixel nombre="bloque" tam={26} /> Mapa de actividad</h2>
+      <p><b>{totalCambios}</b> cambios en <b>{porDia.size}</b> {porDia.size === 1 ? 'día' : 'días'}</p>
+    </div>
+    <div class="mapa" role="img" aria-label={`Actividad de las últimas ${SEMANAS} semanas`}>
+      {celdas.map((c) =>
+        c.c ? <a class={`celda n${nivel(c.c)}`} href={`#d-${c.k}`} title={`${corta.format(c.d)}: ${c.c} ${c.c === 1 ? 'cambio' : 'cambios'}`}></a>
+            : <span class:list={['celda', { futuro: c.futuro }]}></span>)}
+    </div>
+    <p class="leyenda">Menos <span class="celda"></span><span class="celda n1"></span><span class="celda n2"></span><span class="celda n3"></span> Más</p>
+  </section>
+
+  <div class="filtros" role="group" aria-label="Filtrar por tipo">
+    <button class="activo" data-filtro=""><Pixel nombre="cofre" tam={20} />Todo</button>
+    {categorias.map((c) => <button data-filtro={c}><Pixel nombre={iconos[c]} tam={20} />{c}</button>)}
+  </div>
+
+  <div class="diario">
+    {entradas.map(({ n, Content, total }, i) => (
+      <article class="nota" data-categoria={n.data.categoria} id={i === entradas.findIndex((e) => clave(e.n.data.fecha) === clave(n.data.fecha)) ? `d-${clave(n.data.fecha)}` : undefined}>
+        <div class="sello">
+          <b>{n.data.fecha.getUTCDate()}</b>
+          <span>{new Intl.DateTimeFormat('es', { month: 'short', timeZone: 'UTC' }).format(n.data.fecha)}</span>
+        </div>
+        <div>
+          <p class="meta"><Pixel nombre={iconos[n.data.categoria]} tam={18} />{n.data.categoria} · {total} {total === 1 ? 'cambio' : 'cambios'}</p>
+          <h2><a href={`/novedades/${n.id}`}>{n.data.titulo}</a></h2>
+          <div class="cuerpo"><Content /></div>
+        </div>
+      </article>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .racha { background: var(--panel); clip-path: var(--pix); box-shadow: inset 3px 3px 0 rgb(255 255 255 / .06), inset -3px -3px 0 rgb(0 0 0 / .5); padding: 24px; margin-bottom: 24px; }
+  .racha-cabecera { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; margin-bottom: 16px; }
+  .racha h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.4rem; text-transform: uppercase; }
+  .racha-cabecera p { margin: 0; color: var(--muted); }
+  .racha-cabecera b { color: var(--gold); font-family: var(--display); font-weight: 400; font-size: 1.2rem; }
+  .mapa { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; max-width: 640px; }
+  .celda { display: inline-block; aspect-ratio: 1; min-width: 12px; background: #2a1d17; box-shadow: inset -2px -2px 0 rgb(0 0 0 / .35); }
+  .celda.futuro { opacity: .3; }
+  .n1 { background: #7a3a10; }
+  .n2 { background: #d0560f; }
+  .n3 { background: var(--gold); }
+  a.celda:hover { outline: 2px solid var(--cream); }
+  .leyenda { display: flex; align-items: center; gap: 4px; margin: 14px 0 0; font-size: .8rem; color: var(--muted); }
+  .leyenda .celda { width: 14px; }
+  .filtros { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 36px; }
+  .filtros button { display: inline-flex; align-items: center; gap: 8px; border: 0; padding: 8px 14px 8px 10px; background: #8b8b8b; color: #1d1d1d; font: 800 .9rem 'Nunito Variable', sans-serif; cursor: pointer; box-shadow: inset 3px 3px 0 #c6c6c6, inset -3px -3px 0 #555; }
+  .filtros :global(svg), .meta :global(svg) { height: 20px; width: auto; }
+  .filtros button.activo { background: var(--gold); box-shadow: inset 3px 3px 0 #ffe9a6, inset -3px -3px 0 #a86d00; }
+  .diario { display: grid; gap: 20px; }
+  .nota { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 22px; padding: 26px; background: var(--pixels), #f1dfbd; color: #3b2515; clip-path: var(--pix); box-shadow: inset 0 0 0 5px #c9a676; scroll-margin-top: 90px; }
+  .nota[hidden] { display: none; }
+  .sello { display: grid; place-content: center; text-align: center; width: 76px; height: 76px; background: var(--red); color: var(--cream); clip-path: var(--pix); box-shadow: inset 0 -5px 0 var(--deep); transform: rotate(-4deg); }
+  .sello b { font: 2rem/1 var(--display); font-weight: 400; }
+  .sello span { font: .8rem var(--display); text-transform: uppercase; letter-spacing: .08em; }
+  .meta { display: flex; align-items: center; gap: 8px; margin: 0; font-weight: 800; font-size: .85rem; color: #a23a0c; text-transform: uppercase; letter-spacing: .04em; }
+  .nota h2 { margin: 6px 0 10px; font-size: 1.7rem; text-shadow: none; }
+  .nota h2 a { color: #3b2515; text-decoration: none; }
+  .nota h2 a:hover { color: #a23a0c; }
+  .cuerpo :global(p) { margin: 0 0 10px; }
+  .cuerpo :global(ul) { list-style: none; padding: 0; }
+  .cuerpo :global(li) { position: relative; padding-left: 22px; margin-bottom: 8px; }
+  .cuerpo :global(li::before) { content: '✦'; position: absolute; left: 0; color: #c94b00; }
+  .cuerpo :global(code) { background: #3b2515; color: var(--gold); }
+  @media (max-width: 560px) {
+    .nota { grid-template-columns: 1fr; padding: 20px; }
+    .mapa { gap: 2px; }
+    .celda { min-width: 0; }
+  }
+</style>
+
+<script>
+  const botones = document.querySelectorAll<HTMLButtonElement>('.filtros button');
+  botones.forEach((b) => b.addEventListener('click', () => {
+    botones.forEach((o) => o.classList.toggle('activo', o === b));
+    document.querySelectorAll<HTMLElement>('.nota').forEach((e) => {
+      e.hidden = !!b.dataset.filtro && e.dataset.categoria !== b.dataset.filtro;
+    });
+  }));
+</script>

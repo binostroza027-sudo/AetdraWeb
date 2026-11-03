@@ -1,0 +1,36 @@
+---
+import Legal from '../layouts/Legal.astro';
+import A from '../components/Apartado.astro';
+
+const secciones = [
+  { id: 'que-es', titulo: 'Qué es una cookie' },
+  { id: 'aetdra', titulo: 'Lo que guarda AetdraMC' },
+  { id: 'terceros', titulo: 'Cookies de terceros' },
+  { id: 'borrar', titulo: 'Cómo borrarlas o bloquearlas' },
+  { id: 'cambios', titulo: 'Cambios' },
+];
+---
+<Legal titulo="Cookies" icono="reloj" actualizado="3 de noviembre de 2026" minutos={2} secciones={secciones} descripcion="Corto y claro: qué se guarda en tu navegador cuando visitas esta web.">
+  <A n={1} id="que-es" titulo="Qué es una cookie">
+    <p class="destacado">Una cookie es un pequeño archivo que una web guarda en tu navegador para recordar algo entre visitas.</p>
+    <p>Existen tecnologías parecidas, como el almacenamiento local (<code>localStorage</code>). Esta página cubre todas.</p>
+  </A>
+  <A n={2} id="aetdra" titulo="Lo que guarda AetdraMC">
+    <p class="destacado">Nada. Esta web no guarda cookies ni datos en tu navegador.</p>
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Nombre</th><th>Tipo</th><th>Para qué</th><th>Duración</th></tr></thead>
+        <tbody><tr><td colspan="4">No usamos ninguna.</td></tr></tbody>
+      </table>
+    </div>
+  </A>
+  <A n={3} id="terceros" titulo="Cookies de terceros">
+    <p>Cloudflare, que aloja la web, puede usar cookies técnicas necesarias para protegerla de ataques. No sirven para seguirte ni para publicidad.</p>
+  </A>
+  <A n={4} id="borrar" titulo="Cómo borrarlas o bloquearlas">
+    <p>Puedes borrar o bloquear las cookies desde la configuración de privacidad de tu navegador. La web seguirá funcionando.</p>
+  </A>
+  <A n={5} id="cambios" titulo="Cambios">
+    <p>Si algún día añadimos cookies, actualizaremos esta página y te pediremos permiso cuando la ley lo exija.</p>
+  </A>
+</Legal>

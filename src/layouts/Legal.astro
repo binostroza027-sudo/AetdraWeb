@@ -1,0 +1,61 @@
+---
+import Base from './Base.astro';
+import Pixel from '../components/Pixel.astro';
+
+const { titulo, descripcion, icono = 'libro', actualizado, minutos, secciones, etiqueta = 'Legal' } = Astro.props;
+const romanos = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+---
+<Base titulo={titulo} descripcion={descripcion}>
+  <header class="cabecera">
+    <span class="sello"><Pixel nombre={icono} tam={40} /></span>
+    <div>
+      <p class="etiqueta">{etiqueta}</p>
+      <h1>{titulo}</h1>
+      <p class="intro">{descripcion}</p>
+      <p class="datos">Actualizado el {actualizado} · {secciones.length} capítulos · {minutos} min</p>
+    </div>
+  </header>
+  <nav class="marcapaginas" aria-label="Capítulos">
+    {secciones.map((s, i) => <a href={`#${s.id}`}><b>{romanos[i]}</b>{s.titulo}</a>)}
+  </nav>
+  <article class="pergamino"><slot /></article>
+</Base>
+
+<style>
+  .cabecera { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 28px; }
+  .sello { flex: none; display: grid; place-items: center; width: 84px; height: 84px; margin-top: 6px; background: #8b8b8b; box-shadow: inset 4px 4px 0 #373737, inset -4px -4px 0 #fff; }
+  .datos { margin: -18px 0 0; color: var(--gold); font-weight: 800; font-size: .9rem; }
+  .marcapaginas { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: -4px; padding-left: 18px; position: relative; z-index: 1; }
+  .marcapaginas a { display: flex; gap: 8px; align-items: baseline; padding: 8px 14px 12px; background: var(--deep); color: var(--cream); text-decoration: none; font-weight: 800; font-size: .85rem; clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%); transition: transform .12s steps(2), background .12s; }
+  .marcapaginas a b { font: .8rem var(--display); color: var(--gold); }
+  .marcapaginas a:hover, .marcapaginas a.activo { background: var(--red); transform: translateY(4px); }
+  .pergamino {
+    --tinta: #3b2515;
+    position: relative;
+    max-width: 880px;
+    padding: clamp(28px, 5vw, 56px);
+    background: var(--pixels), #f1dfbd;
+    color: var(--tinta);
+    clip-path: var(--pix);
+    box-shadow: inset 0 0 0 6px #c9a676, inset 0 0 0 10px #e7cfa3;
+  }
+  .pergamino :global(a) { color: #a23a0c; font-weight: 800; }
+  .pergamino :global(code) { background: #3b2515; color: var(--gold); }
+  .pergamino :global(.card), .pergamino :global(details), .pergamino :global(.edicion) { color: var(--text); }
+  @media (max-width: 640px) {
+    .cabecera { flex-direction: column; gap: 12px; }
+    .marcapaginas { padding-left: 0; }
+  }
+</style>
+
+<script>
+  const cintas = new Map([...document.querySelectorAll<HTMLAnchorElement>('.marcapaginas a')].map((a) => [a.hash.slice(1), a]));
+  const observador = new IntersectionObserver((entradas) => {
+    for (const e of entradas) {
+      if (!e.isIntersecting) continue;
+      cintas.forEach((a) => a.classList.remove('activo'));
+      cintas.get(e.target.id)?.classList.add('activo');
+    }
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  document.querySelectorAll('.capitulo').forEach((s) => observador.observe(s));
+</script>

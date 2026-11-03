@@ -1,0 +1,67 @@
+---
+import Legal from '../layouts/Legal.astro';
+import A from '../components/Apartado.astro';
+import { site } from '../site';
+
+const secciones = [
+  { id: 'quienes', titulo: 'Quiénes somos' },
+  { id: 'datos', titulo: 'Qué datos tratamos' },
+  { id: 'usos', titulo: 'Para qué los usamos' },
+  { id: 'navegador', titulo: 'Cookies y tu navegador' },
+  { id: 'terceros', titulo: 'Servicios de terceros' },
+  { id: 'conservacion', titulo: 'Cuánto tiempo los guardamos' },
+  { id: 'derechos', titulo: 'Tus derechos' },
+  { id: 'menores', titulo: 'Menores de edad' },
+  { id: 'seguridad', titulo: 'Seguridad y cambios' },
+];
+---
+<Legal titulo="Privacidad" icono="cofre" actualizado="3 de noviembre de 2026" minutos={5} secciones={secciones} descripcion="Qué datos guardamos cuando juegas o visitas la web, para qué y cómo puedes pedir que los borremos.">
+  <A n={1} id="quienes" titulo="Quiénes somos">
+    <p class="destacado">AetdraMC es un servidor de Minecraft Java y aetdramc.live es su web oficial. Lo gestiona su equipo, encabezado por _Eonix.</p>
+    <p>El equipo es responsable de los datos que se describen aquí. Puedes escribirnos en nuestro <a href={site.discord}>Discord</a> o desde la página de <a href="/contacto">contacto</a>.</p>
+  </A>
+  <A n={2} id="datos" titulo="Qué datos tratamos">
+    <div class="tabla">
+      <table>
+        <thead><tr><th>Dónde</th><th>Datos</th></tr></thead>
+        <tbody>
+          <tr><td>En el servidor</td><td>Nick, identificador de Minecraft, dirección IP, progreso y estadísticas, mensajes del chat, comandos y acciones en el mundo.</td></tr>
+          <tr><td>Cuentas no premium</td><td>Tu contraseña, guardada cifrada. Nadie del equipo puede leerla.</td></tr>
+          <tr><td>En la web</td><td>Datos técnicos de la conexión, como la IP, que procesa el alojamiento para servir la página.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </A>
+  <A n={3} id="usos" titulo="Para qué los usamos">
+    <ul>
+      <li>Que puedas jugar y conservar tu progreso.</li>
+      <li>Proteger las cuentas y evitar suplantaciones.</li>
+      <li>Moderar: resolver reportes, aplicar sanciones y revertir daños en el mundo.</li>
+      <li>Mostrar estadísticas y clasificaciones del servidor.</li>
+    </ul>
+    <p>No vendemos tus datos ni los usamos para publicidad.</p>
+  </A>
+  <A n={4} id="navegador" titulo="Cookies y tu navegador">
+    <p>Esta web no usa cookies propias ni guarda nada en tu navegador. Lo tienes todo en la <a href="/cookies">política de cookies</a>.</p>
+  </A>
+  <A n={5} id="terceros" titulo="Servicios de terceros">
+    <ul>
+      <li><b>Cloudflare</b> aloja la web y la protege frente a ataques.</li>
+      <li><b>mcsrvstat.us</b> responde a la consulta que hace tu navegador para mostrar el estado del servidor y recibe tu IP al hacerla.</li>
+      <li><b>Discord</b> tiene su propia política de privacidad si entras en nuestra comunidad.</li>
+    </ul>
+  </A>
+  <A n={6} id="conservacion" titulo="Cuánto tiempo los guardamos">
+    <p>Guardamos los datos del juego mientras tu cuenta siga activa. Los registros de moderación se guardan mientras sean necesarios para gestionar reportes y sanciones.</p>
+  </A>
+  <A n={7} id="derechos" titulo="Tus derechos">
+    <p>Puedes pedirnos qué datos tenemos sobre ti, que los corrijamos o que los borremos. Escríbenos en <a href={site.discord}>Discord</a> indicando tu nick.</p>
+    <p>Puede que conservemos los datos de sanciones activas para evitar que se eludan.</p>
+  </A>
+  <A n={8} id="menores" titulo="Menores de edad">
+    <p>Si eres menor de edad, usa el servidor y nuestro Discord con permiso de tu madre, padre o tutor. Si eres su tutor y quieres que borremos sus datos, contáctanos.</p>
+  </A>
+  <A n={9} id="seguridad" titulo="Seguridad y cambios">
+    <p>Solo el equipo autorizado accede a los datos del servidor. Si cambiamos esta política, actualizaremos la fecha de arriba y avisaremos de los cambios importantes en Discord.</p>
+  </A>
+</Legal>

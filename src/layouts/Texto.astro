@@ -1,0 +1,20 @@
+---
+import Base from './Base.astro';
+import Pixel from '../components/Pixel.astro';
+
+const { titulo, descripcion, icono = 'libro', actualizado } = Astro.props;
+---
+<Base titulo={titulo} descripcion={descripcion}>
+  <article class="prose">
+    <h1><Pixel nombre={icono} tam={40} class="icono-titulo" />{titulo}</h1>
+    {actualizado && <p class="fecha">Última actualización: {actualizado}</p>}
+    <slot />
+  </article>
+</Base>
+
+<style>
+  .fecha { color: var(--muted); font-size: .9rem; margin-top: -6px; }
+  article :global(h2) { margin-top: 36px; text-transform: uppercase; }
+  article :global(li) { margin-bottom: 6px; }
+  h1 :global(.icono-titulo) { vertical-align: -2px; margin-right: 14px; }
+</style>

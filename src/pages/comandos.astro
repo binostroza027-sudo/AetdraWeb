@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+import renderPagina from '../assets/render-comandos.webp';
+import Base from '../layouts/Base.astro';
+import Pixel from '../components/Pixel.astro';
+
+const grupos = [
+  ['cofre', 'Menús', 'Llega a todo desde un solo lugar.', ['/menu', '/destinos', '/cosmeticos', '/suerte', '/ajustes']],
+  ['antorcha', 'Teletransporte', 'Muévete por el mundo y guarda tus casas.', ['/spawn', '/warp', '/rtp', '/home', '/sethome', '/delhome', '/back', '/tpa', '/tpaccept', '/tpdeny']],
+  ['libro', 'Chat', 'Habla en privado y pide ayuda.', ['/msg', '/r', '/ignore', '/list', '/helpop', '/rules']],
+  ['esmeralda', 'Economía', 'Dinero, tienda y subastas.', ['/balance', '/pay', '/baltop', '/shop', '/ah']],
+  ['bandera', 'Clanes', 'Tierras, naciones y permisos.', ['/lands', '/nations', '/claim', '/unclaim', '/trust', '/untrust']],
+  ['pico', 'Progreso', 'Trabajos, misiones, kits y recompensas.', ['/jobs', '/quests', '/rewards', '/playtime', '/kit']],
+  ['corona', 'Eventos', 'Compite y gana premios.', ['/koth', '/envoy', '/chatgames']],
+  ['espada', 'PvP', 'Combate y recompensas por cabeza.', ['/pvp', '/pvpstatus', '/grace', '/bounty', '/bounties']],
+  ['bloque', 'Granjas', 'Generadores, tolvas y bolsas.', ['/farms', '/hopper', '/spawnershop', '/bags']],
+  ['hoja', 'Estaciones', 'Consulta la estación y sus opciones.', ['/season', '/toggletemperature', '/currentbiome']],
+  ['corazon', 'Estilo', 'Cosméticos y brillo.', ['/cosmetics', '/equip', '/unequipall', '/glow']],
+  ['reloj', 'Red', 'Vuelve al inicio de la red.', ['/hub', '/lobby']],
+] as const;
+---
+<Base titulo="Comandos" descripcion="Comandos principales para jugadores de AetdraMC.">
+  <h1>Comandos</h1>
+  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de ElVenjo" width={360} />
+  <p class="intro">Los comandos principales para jugar. Si no recuerdas uno, empieza por <code>/menu</code>.</p>
+  <div class="grid">
+    {grupos.map(([ic, t, d, lista]) => (
+      <section class="card">
+        <h2><Pixel nombre={ic} tam={26} />{t}</h2>
+        <p>{d}</p>
+        <div class="lista">{lista.map((c) => <code>{c}</code>)}</div>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<style>
+  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; text-transform: uppercase; }
+  .lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .lista code { background: var(--panel-2); color: var(--gold); clip-path: var(--pix); padding: 3px 10px; }
+</style>
