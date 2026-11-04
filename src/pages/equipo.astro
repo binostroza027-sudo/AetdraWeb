@@ -36,6 +36,8 @@ const total = rangos.reduce((n, r) => n + r.miembros.length, 0);
   .rango { margin-bottom: 48px; }
   .r-owner { --rango: #e8231a; }
   .r-admin { --rango: #ff8a1f; }
+  .r-media { --rango: #c954cc; }
+  .rango h2 :global(svg) { height: 30px; width: auto; }
   .rango h2 { display: flex; align-items: center; gap: 12px; font-size: 1.7rem; text-transform: uppercase; margin-bottom: 18px; }
   .rango small { font: 800 .9rem 'Nunito Variable', sans-serif; color: var(--muted); text-transform: none; }
   .miembros { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
