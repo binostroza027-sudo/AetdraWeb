@@ -1,33 +1,86 @@
 ---
-import { Image } from 'astro:assets';
-import renderPagina from '../assets/render-reglamento.webp';
-import Base from '../layouts/Base.astro';
-import Pixel from '../components/Pixel.astro';
+import Legal from '../layouts/Legal.astro';
+import A from '../components/Apartado.astro';
 import { site } from '../site';
 
-const reglas = [
-  ['Respeta a los jugadores', 'Sin acoso, amenazas ni discriminación.'],
-  ['Juega limpio', 'Sin cheats, duplicaciones ni explotación de errores.'],
-  ['Respeta las zonas', 'Cumple las zonas protegidas y las normas de combate.'],
-  ['Sin spam', 'Evita el spam y la publicidad de otros servidores.'],
+const secciones = [
+  { id: 'convivencia', titulo: 'Convivencia' },
+  { id: 'juego-limpio', titulo: 'Juego limpio' },
+  { id: 'terrenos', titulo: 'Terrenos y construcción' },
+  { id: 'pvp', titulo: 'PvP, combate y eventos' },
+  { id: 'economia', titulo: 'Economía, tienda y coins' },
+  { id: 'sanciones', titulo: 'Staff, sanciones y apelaciones' },
+  { id: 'contacto', titulo: 'Contacto' },
 ];
 ---
-<Base titulo="Reglamento" descripcion="Reglas del Survival de AetdraMC.">
-  <h1>Reglamento</h1>
-  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de ElVenjo" width={360} />
-  <p class="intro">Las reglas del Survival. También puedes verlas dentro del juego con <code>/rules</code>.</p>
-  <ol class="reglas">
-    {reglas.map(([t, d], i) => (
-      <li class="card"><span class="num">{i + 1}</span><div><h2>{t}</h2><p>{d}</p></div></li>
-    ))}
-  </ol>
-  <p class="ayuda"><Pixel nombre="antorcha" tam={10} /> ¿Necesitas ayuda? Usa <code>/helpop</code> o entra en nuestro <a href={site.discord}>Discord</a>.</p>
-</Base>
+<Legal titulo="Reglamento" etiqueta="Reglas del servidor" icono="espada" actualizado="4 de noviembre de 2026" minutos={5} secciones={secciones} descripcion="Al entrar al servidor aceptas estas reglas. El staff puede actuar según su criterio en casos que no estén escritos aquí. Las reglas pueden cambiar; los cambios se anuncian en el Discord.">
+  <A n={1} id="convivencia" titulo="Convivencia">
+    <ol>
+      <li>Respeta a todos los jugadores y al staff. No se permiten insultos, acoso, amenazas ni discriminación de ningún tipo.</li>
+      <li>No hagas spam, flood ni abuses de las mayúsculas. No repitas el mismo mensaje.</li>
+      <li>No hagas publicidad de otros servidores, canales o tiendas sin permiso del staff.</li>
+      <li>No compartas datos personales tuyos ni de otras personas, ni difundas capturas privadas.</li>
+      <li>No suplantes al staff ni a otros jugadores.</li>
+      <li>El chat debe ser apto para todos: nada de contenido sexual, violento o ilegal.</li>
+      <li>Chat de voz: sin gritos, ruidos molestos, música con derechos de autor ni grabaciones sin permiso de los demás.</li>
+    </ol>
+  </A>
+  <A n={2} id="juego-limpio" titulo="Juego limpio">
+    <ol>
+      <li>Están prohibidos los hacks, el x-ray, las macros, los autoclickers y cualquier mod o programa que dé ventaja injusta.</li>
+      <li>Están prohibidas las duplicaciones de ítems, bloques o TNT (incluidos los dupers de TNT y de adoquín) y aprovecharse de errores del juego o del servidor.</li>
+      <li>Si encuentras un error, repórtalo con <code>/helpop</code> o en el Discord. Usarlo en tu beneficio es una falta.</li>
+      <li>Las granjas son bienvenidas, pero no las que provoquen lag. El staff puede limitar o eliminar las que afecten al rendimiento.</li>
+      <li>No uses cuentas alternativas para obtener ventajas, eludir sanciones o recibir recompensas varias veces.</li>
+      <li>Solo se permiten las versiones de Minecraft indicadas en la web (de la 1.21.4 a la 26.3).</li>
+    </ol>
+  </A>
+  <A n={3} id="terrenos" titulo="Terrenos y construcción">
+    <ol>
+      <li>Protege tu base con <code>/lands</code>. Lo que no esté protegido puede dañarse, y el servidor no garantiza su recuperación.</li>
+      <li>Está prohibido destruir, modificar o robar en terrenos ajenos, y construir trampas para engañar a otros jugadores.</li>
+      <li>No construyas en el spawn ni bloquees caminos, portales o zonas comunes.</li>
+      <li>No construyas obras ofensivas ni con símbolos de odio.</li>
+      <li>Las estructuras que causen lag o dañen la experiencia de los demás pueden ser eliminadas por el staff.</li>
+    </ol>
+  </A>
+  <A n={4} id="pvp" titulo="PvP, combate y eventos">
+    <ol>
+      <li>El PvP solo es válido en las zonas y modos permitidos, y respetando la protección de jugadores nuevos.</li>
+      <li>Está prohibido salir del juego en combate, el spawn kill, matar con trampas ocultas y obstaculizar a quien está en un evento.</li>
+      <li>En los eventos (KOTH, jefes de mundo, drops y mazmorras) no se permite aprovechar errores, bloquear el acceso a otros ni robar recompensas ajenas.</li>
+      <li>Las armas y habilidades custom deben usarse como están pensadas: no se permiten combinaciones que exploten errores.</li>
+    </ol>
+  </A>
+  <A n={5} id="economia" titulo="Economía, tienda y coins">
+    <ol>
+      <li>Sin estafas ni engaños en tiendas, subastas, intercambios o pagos.</li>
+      <li>Está prohibido vender o comprar dinero, coins, objetos, cuentas o rangos a cambio de dinero real fuera de la tienda oficial.</li>
+      <li>Los coins se ganan jugando (votos, misiones, tiempo, eventos y jefes) y se gastan en la tienda del servidor. Las compras con coins no se reembolsan.</li>
+      <li>Las ventajas de la tienda son de comodidad y estilo: no se venden ventajas de combate.</li>
+      <li>Eres responsable de tu cuenta. No la compartas, no la vendas y no la prestes.</li>
+    </ol>
+  </A>
+  <A n={6} id="sanciones" titulo="Staff, sanciones y apelaciones">
+    <ol>
+      <li>Obedece las indicaciones del staff. No les pidas rangos ni permisos.</li>
+      <li>Las sanciones dependen de la gravedad y de los antecedentes: aviso, silencio, expulsión, ban temporal o ban permanente.</li>
+      <li>Eludir una sanción con otra cuenta lleva a un ban permanente.</li>
+      <li>Si crees que una sanción fue injusta, apela en el Discord con pruebas y de forma respetuosa. No insistas por el chat del servidor.</li>
+      <li>Está prohibido mentir al staff o aportar pruebas falsas.</li>
+    </ol>
+  </A>
+  <A n={7} id="contacto" titulo="Contacto">
+    <ul>
+      <li>Dudas y reportes dentro del juego: <code>/helpop</code>.</li>
+      <li>Ayuda, apelaciones y novedades: <a href={site.discord}>Discord oficial</a> (discord.aetdramc.live).</li>
+      <li>Guía completa: <a href="/guia">aetdramc.live/guia</a>.</li>
+    </ul>
+  </A>
+</Legal>
 
 <style>
-  .reglas { list-style: none; display: grid; gap: 12px; max-width: 760px; margin: 0; padding: 0; }
-  .card { display: flex; gap: 18px; align-items: center; padding: 20px 24px; }
-  .card h2 { margin: 0 0 2px; font-size: 1.25rem; text-transform: uppercase; }
-  .card p { margin: 0; }
-  .ayuda { margin-top: 28px; }
+  ol { padding-left: 0; list-style: none; counter-reset: regla; }
+  ol li { counter-increment: regla; position: relative; padding: 2px 0 10px 40px; }
+  ol li::before { content: counter(regla); position: absolute; left: 0; top: 2px; display: grid; place-items: center; width: 28px; height: 28px; background: #3b2515; color: var(--gold); font: .95rem var(--display); clip-path: var(--pix); }
 </style>
