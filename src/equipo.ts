@@ -8,6 +8,7 @@ import thetomatito from './assets/equipo/thetomatito.webp';
 // El color de cada rango está en src/pages/equipo.astro (clases r-*).
 export const rangos = [
   { nombre: 'Owner', clase: 'r-owner', icono: 'corona', miembros: [{ nick: '_Eonix', render: eonix }] },
-  { nombre: 'Admin', clase: 'r-admin', icono: 'espada', miembros: [{ nick: 'ElVenjo', render: elvenjo }, { nick: 'Meliinoeee', render: meliinoeee }] },
+  { nombre: 'Manager', clase: 'r-manager', icono: 'esmeralda', miembros: [{ nick: 'Meliinoeee', render: meliinoeee }] },
+  { nombre: 'Admin', clase: 'r-admin', icono: 'espada', miembros: [{ nick: 'ElVenjo', render: elvenjo }] },
   { nombre: 'Media', clase: 'r-media', icono: 'antorcha', miembros: [{ nick: 'Jam3r25', render: jam3r25 }, { nick: 'thetomatito', render: thetomatito }] },
 ];
