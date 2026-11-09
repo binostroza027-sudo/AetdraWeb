@@ -1,0 +1,17 @@
+{
+  "timezone": "America/Santiago",
+  "cycleStart": "2026-11-09",
+  "cycleWeeks": 3,
+  "minimumOnlinePlayers": 4,
+  "schedule": [
+    {"week":1,"isoWeekday":3,"time":"19:30","arena":"Bastión Carmesí","warp":"koth1"},
+    {"week":1,"isoWeekday":5,"time":"21:30","arena":"Cumbre de Ceniza","warp":"koth2"},
+    {"week":1,"isoWeekday":7,"time":"17:00","arena":"Corona del Abismo","warp":"koth3"},
+    {"week":2,"isoWeekday":2,"time":"20:30","arena":"Corona del Abismo","warp":"koth3"},
+    {"week":2,"isoWeekday":4,"time":"19:00","arena":"Bastión Carmesí","warp":"koth1"},
+    {"week":2,"isoWeekday":6,"time":"22:00","arena":"Cumbre de Ceniza","warp":"koth2"},
+    {"week":3,"isoWeekday":3,"time":"21:00","arena":"Cumbre de Ceniza","warp":"koth2"},
+    {"week":3,"isoWeekday":6,"time":"16:00","arena":"Corona del Abismo","warp":"koth3"},
+    {"week":3,"isoWeekday":7,"time":"20:30","arena":"Bastión Carmesí","warp":"koth1"}
+  ]
+}

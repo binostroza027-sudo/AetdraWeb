@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import renderPagina from '../assets/render-comandos.webp';
 import Base from '../layouts/Base.astro';
 import Pixel from '../components/Pixel.astro';
+import CalendarioKoth from '../components/CalendarioKoth.astro';
 
 const grupos = [
   ['cofre', 'Menús', 'Llega a todo desde un solo lugar.', ['/menu', '/destinos', '/cosmeticos', '/suerte', '/ajustes']],
@@ -25,17 +26,46 @@ const grupos = [
   <p class="intro">Los comandos principales para jugar. Si no recuerdas uno, empieza por <code>/menu</code>.</p>
   <div class="grid">
     {grupos.map(([ic, t, d, lista]) => (
-      <section class="card">
-        <h2><Pixel nombre={ic} tam={26} />{t}</h2>
+      <details class="card categoria" id={t === 'Eventos' ? 'eventos' : undefined}>
+        <summary><Pixel nombre={ic} tam={26} />{t}</summary>
         <p>{d}</p>
         <div class="lista">{lista.map((c) => <code>{c}</code>)}</div>
-      </section>
+        {t === 'Eventos' && (
+          <details class="calendario">
+            <summary>COT</summary>
+            <CalendarioKoth />
+          </details>
+        )}
+      </details>
     ))}
   </div>
 </Base>
 
+<script>
+  function abrirEnlace() {
+    const eventos = document.querySelector<HTMLDetailsElement>('#eventos')!;
+    if (location.hash === '#eventos' || location.hash === '#calendario-koth') eventos.open = true;
+    if (location.hash === '#calendario-koth') {
+      eventos.querySelector<HTMLDetailsElement>('.calendario')!.open = true;
+      document.querySelector('#calendario-koth')?.scrollIntoView();
+    }
+  }
+
+  abrirEnlace();
+  window.addEventListener('hashchange', abrirEnlace);
+</script>
+
 <style>
-  h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 4px; text-transform: uppercase; }
+  .grid { align-items: start; }
+  summary { display: flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 800; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; margin-inline-start: auto; color: var(--gold); }
+  details[open] > summary::after { content: '−'; }
+  summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  .categoria > summary { text-transform: uppercase; }
+  .categoria > p { margin-top: 10px; }
+  .calendario { margin-top: 12px; box-shadow: none; }
+  .calendario > summary { width: fit-content; background: var(--panel-2); color: var(--gold); padding: 6px 12px; }
   .lista { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
   .lista code { background: var(--panel-2); color: var(--gold); clip-path: var(--pix); padding: 3px 10px; }
 </style>

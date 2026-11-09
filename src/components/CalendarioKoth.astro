@@ -1,0 +1,85 @@
+---
+import calendario from '../data/KOTH-CALENDARIO.json';
+import Pixel from './Pixel.astro';
+---
+
+<div id="calendario-koth">
+  <h3><Pixel nombre="reloj" tam={20} /> Calendario KOTH</h3>
+  <p class="estado"><strong>Horario previsto · pendiente de activación</strong></p>
+  <p>Survival sigue usando la rotación de 90 minutos. El servidor debe confirmar cuándo hay un KOTH activo.</p>
+  <p>Horario de Chile continental. El calendario previsto requiere {calendario.minimumOnlinePlayers} jugadores conectados como mínimo.</p>
+  <h4>Próximo KOTH previsto</h4>
+  <p data-proximo></p>
+  <p data-cuenta></p>
+  <h4>Eventos de esta semana</h4>
+  <p data-vacio hidden>No hay eventos previstos para esta semana.</p>
+  <ul data-eventos></ul>
+  <template>
+    <li>
+      <strong></strong> · <time></time>
+      <span>En Survival, abre <code>/menu</code> → Eventos.</span>
+    </li>
+  </template>
+  <noscript><p>Activa JavaScript para consultar las fechas previstas y la cuenta regresiva.</p></noscript>
+</div>
+
+<script>
+  import calendario from '../data/KOTH-CALENDARIO.json';
+  import { calendarioKoth } from '../koth';
+
+  const panel = document.querySelector('#calendario-koth')!;
+  const lista = panel.querySelector('[data-eventos]')!;
+  const vacio = panel.querySelector<HTMLElement>('[data-vacio]')!;
+  const proximo = panel.querySelector('[data-proximo]')!;
+  const cuenta = panel.querySelector('[data-cuenta]')!;
+  const plantilla = panel.querySelector('template')!;
+  const formato = new Intl.DateTimeFormat('es-CL', {
+    timeZone: calendario.timezone, weekday: 'long', day: 'numeric',
+    month: 'long', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  });
+
+  let semanaMostrada: number | undefined;
+  let siguiente: ReturnType<typeof calendarioKoth>['proximo'];
+  let revisarSemana = 0;
+
+  function actualizar() {
+    const ahora = Date.now();
+    if (ahora >= revisarSemana || !siguiente || ahora > siguiente.instante) {
+      const { eventos, proximo: evento, indice } = calendarioKoth(ahora);
+      siguiente = evento;
+      revisarSemana = ahora + 1000;
+      proximo.textContent = evento ? `${evento.arena} · ${formato.format(evento.instante)}` : 'Sin fecha prevista.';
+      if (indice !== semanaMostrada) {
+        semanaMostrada = indice;
+        lista.replaceChildren(...eventos.map(({ arena, instante }) => {
+          const fila = plantilla.content.cloneNode(true) as DocumentFragment;
+          fila.querySelector('strong')!.textContent = arena;
+          const hora = fila.querySelector('time')!;
+          hora.dateTime = new Date(instante).toISOString();
+          hora.textContent = formato.format(instante);
+          return fila;
+        }));
+        vacio.hidden = eventos.length > 0;
+      }
+    }
+    if (siguiente) {
+      const segundos = Math.max(0, Math.ceil((siguiente.instante - ahora) / 1000));
+      const reloj = [Math.floor(segundos / 3600) % 24, Math.floor(segundos / 60) % 60, segundos % 60]
+        .map((valor) => String(valor).padStart(2, '0')).join(':');
+      cuenta.textContent = `Faltan ${Math.floor(segundos / 86400)} d ${reloj}`;
+    }
+  }
+
+  actualizar();
+  window.setInterval(actualizar, 1000);
+</script>
+
+<style>
+  #calendario-koth { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--muted); }
+  h3 { display: flex; align-items: center; gap: 8px; }
+  h4 { margin: 14px 0 4px; }
+  .estado, [data-cuenta] { color: var(--gold); }
+  ul { padding-inline-start: 18px; margin-bottom: 0; }
+  li + li { margin-top: 10px; }
+  li span { display: block; color: var(--muted); }
+</style>
