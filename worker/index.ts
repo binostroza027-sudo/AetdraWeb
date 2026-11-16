@@ -1,11 +1,15 @@
 // Worker de la web: sirve la página estática, guarda el historial de jugadores
 // cada 5 minutos (/api/estado) y recibe los tops que envía el plugin (/api/tops).
 import { DurableObject } from 'cloudflare:workers';
+import { recibirTebex } from './tebex';
+import { catalogo, checkout, estadisticas } from './tienda';
 
 interface Env {
   ASSETS: Fetcher;
   HISTORIAL: DurableObjectNamespace<Historial>;
   TOPS_CLAVE?: string;
+  TEBEX_WEBHOOK_SECRET?: string;
+  TIENDA_META_USD?: string;
 }
 
 const IP = 'play.aetdramc.live';
@@ -85,6 +89,15 @@ export class Historial extends DurableObject<Env> {
     return { rango: dias, paso, puntos, resumen, ahora };
   }
 
+  async tiendaStats(meta?: string) {
+    const eventos = await this.ctx.storage.list({ prefix: 'tebex:event:' });
+    return estadisticas([...eventos.values()], meta);
+  }
+
+  async guardarEventoTebex(evento: any) {
+    await this.ctx.storage.put('tebex:event:' + evento.id, evento);
+  }
+
   async guardarTops(tops: unknown) {
     await this.ctx.storage.put('tops', tops);
   }
@@ -99,6 +112,15 @@ const historial = (env: Env) => env.HISTORIAL.get(env.HISTORIAL.idFromName('prin
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.pathname === '/api/tienda' && req.method === 'GET') {
+      try { return Response.json({ ...await catalogo(), ...await historial(env).tiendaStats(env.TIENDA_META_USD) }, { headers: { 'Cache-Control': 'public, max-age=30' } }); } catch { return Response.json({ error: 'Tienda temporalmente no disponible' }, { status: 503 }); }
+    }
+    if (url.pathname === '/api/tienda/checkout') {
+      try { return await checkout(req); } catch (e) { console.error('checkout', e); return Response.json({ error: 'No pudimos iniciar el pago. Inténtalo de nuevo.' }, { status: 502 }); }
+    }
+    if (url.pathname === '/api/tebex/webhook') {
+      return recibirTebex(req, env.TEBEX_WEBHOOK_SECRET, e => historial(env).guardarEventoTebex(e));
+    }
     if (url.pathname === '/api/estado') {
       const datos = await historial(env).estado(url.searchParams.get('rango') ?? '7');
       return Response.json(datos, { headers: { 'Cache-Control': 'public, max-age=60' } });
@@ -124,3 +146,5 @@ export default {
     await historial(env).muestrear();
   },
 } satisfies ExportedHandler<Env>;
+
+
