@@ -1,5 +1,4 @@
 import eonix from './assets/equipo/eonix.webp';
-import elvenjo from './assets/equipo/elvenjo.webp';
 import meliinoeee from './assets/equipo/meliinoeee.webp';
 import jam3r25 from './assets/equipo/jam3r25.webp';
 import thetomatito from './assets/equipo/thetomatito.webp';
@@ -11,7 +10,6 @@ import dumbito from './assets/equipo/dumbito.webp';
 export const rangos = [
   { nombre: 'Owner', clase: 'r-owner', icono: 'corona', miembros: [{ nick: '_Eonix', render: eonix }] },
   { nombre: 'Manager', clase: 'r-manager', icono: 'esmeralda', miembros: [{ nick: 'Meliinoeee', render: meliinoeee }] },
-  { nombre: 'Admin', clase: 'r-admin', icono: 'espada', miembros: [{ nick: 'ElVenjo', render: elvenjo }] },
   { nombre: 'T-Helper', clase: 'r-thelper', icono: 'corazon', miembros: [{ nick: 'TestigoDelFin', render: testigodelfin }, { nick: 'Dumbito', render: dumbito }] },
   { nombre: 'Media', clase: 'r-media', icono: 'antorcha', miembros: [{ nick: 'Jam3r25', render: jam3r25 }, { nick: 'thetomatito', render: thetomatito }] },
 ];
