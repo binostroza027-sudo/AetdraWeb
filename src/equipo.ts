@@ -11,6 +11,6 @@ export const rangos = [
   { nombre: 'Owner', clase: 'r-owner', icono: 'corona', miembros: [{ nick: '_Eonix', render: eonix }] },
   { nombre: 'Manager', clase: 'r-manager', icono: 'esmeralda', miembros: [{ nick: 'Meliinoeee', render: meliinoeee }] },
   { nombre: 'Admin', clase: 'r-admin', icono: 'espada', miembros: [{ nick: 'ElVenjo', render: elvenjo }] },
-  { nombre: 'Media', clase: 'r-media', icono: 'antorcha', miembros: [{ nick: 'Jam3r25', render: jam3r25 }, { nick: 'thetomatito', render: thetomatito }] },
   { nombre: 'T-Helper', clase: 'r-thelper', icono: 'corazon', miembros: [{ nick: 'TestigoDelFin', render: testigodelfin }] },
+  { nombre: 'Media', clase: 'r-media', icono: 'antorcha', miembros: [{ nick: 'Jam3r25', render: jam3r25 }, { nick: 'thetomatito', render: thetomatito }] },
 ];
