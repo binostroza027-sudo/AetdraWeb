@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import renderPagina from '../assets/render-comandos.webp';
+import renderPagina from '../assets/render-comunidad.webp';
 import Base from '../layouts/Base.astro';
 import Pixel from '../components/Pixel.astro';
 import CalendarioKoth from '../components/CalendarioKoth.astro';
@@ -22,7 +22,7 @@ const grupos = [
 ---
 <Base titulo="Comandos" descripcion="Comandos principales para jugadores de AetdraMC.">
   <h1>Comandos</h1>
-  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de ElVenjo" width={360} />
+  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de _Eonix" width={360} />
   <p class="intro">Los comandos principales para jugar. Si no recuerdas uno, empieza por <code>/menu</code>.</p>
   <div class="grid">
     {grupos.map(([ic, t, d, lista]) => (

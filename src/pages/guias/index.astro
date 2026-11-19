@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import renderPagina from '../../assets/render-guias.webp';
+import renderPagina from '../../assets/render-pasos.webp';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 
@@ -8,7 +8,7 @@ const lista = (await getCollection('guias')).sort((a, b) => a.data.orden - b.dat
 ---
 <Base titulo="Guías">
   <h1>Guías</h1>
-  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de ElVenjo" width={360} />
+  <Image class="render-pagina" src={renderPagina} alt="Render de la skin de Meliinoeee" width={360} />
   <p class="intro">Todo lo que necesitas para empezar a jugar.</p>
   <a class="destacada" href="/guia">
     <span class="etiqueta">Empieza aquí</span>
